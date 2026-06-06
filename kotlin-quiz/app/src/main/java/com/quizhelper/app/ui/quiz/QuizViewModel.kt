@@ -41,6 +41,9 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
     val timeRemaining: StateFlow<Int?> = _timeRemaining.asStateFlow()
 
     private val _isReady = MutableStateFlow(false)
+
+    private val _showTimeWarning = MutableStateFlow(false)
+    val showTimeWarning: StateFlow<Boolean> = _showTimeWarning.asStateFlow()
     val isReady: StateFlow<Boolean> = _isReady.asStateFlow()
 
     /** 当前练习来源: "all" 全部题目, "wrong" 错题集 */
@@ -75,9 +78,11 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
             _session = QuizEngine.createSession(examQuestions, random = false, mode = QuizMode.EXAM, timeLimit = 6000)
             refreshFromSession()
             _isReady.value = true
-            startTimer()
+            timeWarningShown = false; startTimer()
         }
     }
+
+    private var timeWarningShown = false
 
     private fun startTimer() {
         viewModelScope.launch {
@@ -86,6 +91,10 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
             while (_timeRemaining.value ?: 0 > 0 && !_isFinished.value) {
                 delay(1000L)
                 _timeRemaining.value = (_timeRemaining.value ?: 0) - 1
+                if (_timeRemaining.value ?: 0 <= 300 && !timeWarningShown && !_showTimeWarning.value) {
+                    timeWarningShown = true
+                    _showTimeWarning.value = true
+                }
                 if (_timeRemaining.value ?: 0 <= 0) {
                     finishQuiz()
                 }
@@ -178,6 +187,10 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * 自动记录错题：答错时加入错题集；在错题集练习中答对则移出错题集
      */
+    fun dismissTimeWarning() {
+        _showTimeWarning.value = false
+    }
+
     private fun recordWrongQuestion(questionId: Long, isCorrect: Boolean) {
         viewModelScope.launch {
             if (!isCorrect) {

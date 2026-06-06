@@ -276,32 +276,85 @@ fun ConfirmDialog(
     title: String,
     message: String,
     confirmText: String = "确认",
+    confirmColor: Color = Red500,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(title, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Gray800) },
-        text = { Text(message, fontSize = 14.sp, color = Gray600) },
-        confirmButton = {
-            SmallButton(
-                text = confirmText,
-                onClick = onConfirm,
-                containerColor = Red500,
-                textColor = White,
-                fontSize = 14,
-                modifier = Modifier.width(80.dp)
-            )
+        shape = RoundedCornerShape(20.dp),
+        title = {
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Spacer(Modifier.height(4.dp))
+                Text(title, fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Gray800)
+            }
         },
-        dismissButton = {
-            OutlinedButton(
-                onClick = onDismiss,
-                modifier = Modifier.height(40.dp).width(80.dp),
-                shape = RoundedCornerShape(10.dp),
-                border = BorderStroke(1.dp, Gray300),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Gray500)
-            ) {
-                Text("取消", fontSize = 14.sp)
+        text = {
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(message, fontSize = 14.sp, color = Gray600, textAlign = TextAlign.Center)
+            }
+        },
+        confirmButton = {
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                SmallButton(
+                    text = confirmText,
+                    onClick = onConfirm,
+                    modifier = Modifier.fillMaxWidth(),
+                    containerColor = confirmColor,
+                    textColor = White,
+                    fontSize = 14
+                )
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth().height(40.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    border = BorderStroke(1.dp, Gray200),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Gray500)
+                ) {
+                    Text("取消", fontSize = 14.sp)
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun TimeWarningDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(20.dp),
+        title = {
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("⏰", fontSize = 48.sp)
+                Spacer(Modifier.height(8.dp))
+                Text("时间提醒", fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Gray800)
+            }
+        },
+        text = {
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    "距离考试结束还剩 5 分钟",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Amber600,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(Modifier.height(8.dp))
+                Text("请抓紧时间作答！", fontSize = 14.sp, color = Gray600, textAlign = TextAlign.Center)
+            }
+        },
+        confirmButton = {
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                SmallButton(
+                    text = "知道了",
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth(),
+                    containerColor = Amber600,
+                    textColor = White,
+                    fontSize = 14
+                )
             }
         }
     )
@@ -310,13 +363,15 @@ fun ConfirmDialog(
 @Composable
 fun EncouragementDialog(
     result: QuizResult,
-    onDismiss: () -> Unit
+    onViewDetail: () -> Unit,
+    onRetry: () -> Unit,
+    onHome: () -> Unit
 ) {
     val encouragement = remember { Encouragement.random() }
     val isPass = result.correctRate >= 60
 
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = onHome,
         shape = RoundedCornerShape(20.dp),
         title = {
             Column(
@@ -353,7 +408,7 @@ fun EncouragementDialog(
                     fontWeight = FontWeight.Medium,
                     color = if (isPass) Green600 else Red500
                 )
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(12.dp))
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
@@ -371,12 +426,34 @@ fun EncouragementDialog(
             }
         },
         confirmButton = {
-            PrimaryButton(
-                text = "查看详情",
-                onClick = onDismiss,
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                fontSize = 15
-            )
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                PrimaryButton(
+                    text = "📋 查看详情",
+                    onClick = onViewDetail,
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = 15
+                )
+                Spacer(Modifier.height(8.dp))
+                SecondaryButton(
+                    text = "🔄 再练一次",
+                    onClick = onRetry,
+                    modifier = Modifier.fillMaxWidth(),
+                    textColor = Blue600
+                )
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = onHome,
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, Gray200),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Gray400)
+                ) {
+                    Text("返回首页", fontSize = 14.sp)
+                }
+            }
         }
     )
 }

@@ -327,7 +327,9 @@ MainScreen (Scaffold + 底部导航)
 | `ProgressBar` | 答题进度条 |
 | `ScoreCircle` | 圆形分数展示（60分以上绿色） |
 | `ScoreStat` | 统计数字组件 |
-| `ConfirmDialog` | 通用确认弹窗 |
+| `ConfirmDialog` | 通用确认弹窗（圆角20dp + 全宽按钮 + 可自定义颜色） |
+| `TimeWarningDialog` | 考试5分钟倒计时提醒弹窗（琥珀色主题） |
+| `EncouragementDialog` | 完成鼓励弹窗（分数 + 鼓励语 + 三个直达按钮） |
 | `PrimaryButton` | 主操作按钮（蓝底白字，48dp高，圆角12dp） |
 | `SmallButton` | 次要操作按钮（40dp高，圆角10dp） |
 | `SecondaryButton` | 轮廓按钮（灰边框，48dp高，圆角12dp） |

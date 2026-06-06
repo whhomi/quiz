@@ -8,10 +8,11 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.quizhelper.app.data.model.QuizResult
+import com.quizhelper.app.ui.components.EncouragementDialog
+import com.quizhelper.app.ui.navigation.Screen
 
 /**
  * Standalone result screen (used when navigating to result via deep link / sessionId).
- * The QuizScreen handles result internally. This is for external navigation.
  */
 @Composable
 fun ResultScreen(
@@ -22,11 +23,11 @@ fun ResultScreen(
     val result by viewModel.result.collectAsState()
 
     if (result != null) {
-        ResultContent(
+        EncouragementDialog(
             result = result!!,
             onViewDetail = {
                 navController.navigate("history/$sessionId") {
-                    popUpTo("home") { saveState = true }
+                    popUpTo("home") { inclusive = true }
                 }
             },
             onRetry = {

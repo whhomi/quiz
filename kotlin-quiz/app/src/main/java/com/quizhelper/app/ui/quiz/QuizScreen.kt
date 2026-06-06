@@ -1,5 +1,6 @@
 package com.quizhelper.app.ui.quiz
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -43,7 +44,10 @@ fun QuizScreen(
     val isFinished by viewModel.isFinished.collectAsState()
     val result by viewModel.result.collectAsState()
     val timeRemaining by viewModel.timeRemaining.collectAsState()
+    val showTimeWarning by viewModel.showTimeWarning.collectAsState()
     val isReady by viewModel.isReady.collectAsState()
+
+    var showExitConfirm by remember { mutableStateOf(false) }
 
     // Start session based on mode
     var started by remember { mutableStateOf(false) }
@@ -67,18 +71,11 @@ fun QuizScreen(
     }
 
     if (isFinished && result != null) {
-        var showEncouragementDialog by remember { mutableStateOf(true) }
-        if (showEncouragementDialog) {
-            EncouragementDialog(
-                result = result!!,
-                onDismiss = { showEncouragementDialog = false }
-            )
-        }
-        ResultContent(
+        EncouragementDialog(
             result = result!!,
             onViewDetail = {
                 navController.navigate(Screen.HistoryDetail.createRoute(result!!.sessionId)) {
-                    popUpTo(Screen.Home.route) { saveState = true }
+                    popUpTo(Screen.Home.route) { inclusive = true }
                 }
             },
             onRetry = {
@@ -94,6 +91,24 @@ fun QuizScreen(
         return
     }
 
+    if (showExitConfirm) {
+        ConfirmDialog(
+            title = "退出考试",
+            message = "确定要退出考试吗？退出后本次答题记录将不会保存。",
+            confirmText = "确定退出",
+            confirmColor = Amber600,
+            onConfirm = {
+                showExitConfirm = false
+                navController.popBackStack()
+            },
+            onDismiss = { showExitConfirm = false }
+        )
+    }
+
+    if (showTimeWarning) {
+        TimeWarningDialog(onDismiss = { viewModel.dismissTimeWarning() })
+    }
+
     if (question == null) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
@@ -103,6 +118,11 @@ fun QuizScreen(
 
     val session = viewModel.session ?: return
     val isExam = session.mode == QuizMode.EXAM
+    if (isExam) {
+        BackHandler {
+            showExitConfirm = true
+        }
+    }
     var showGrid by remember { mutableStateOf(false) }
     val isAnswered = judgment != null
     val options = question?.getOptionsList() ?: emptyList()

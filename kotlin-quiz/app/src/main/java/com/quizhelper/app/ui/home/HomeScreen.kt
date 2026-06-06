@@ -196,14 +196,8 @@ fun HomeScreen(
             ) {
                 Column(Modifier.padding(16.dp)) {
                     Text("📝 模拟考试", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Gray700)
-                    Spacer(Modifier.height(12.dp))
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        StatItem("单选", "${bankMeta?.singleCount ?: 0}/60", Blue600, Blue50)
-                        StatItem("多选", "${bankMeta?.multipleCount ?: 0}/100", Purple600, Purple50)
-                        StatItem("判断", "${bankMeta?.booleanCount ?: 0}/40", Amber600, Amber50)
-                    }
                     Spacer(Modifier.height(8.dp))
-                    Text("限时 100 分钟，满分 100 分", fontSize = 11.sp, color = Gray400, modifier = Modifier.align(Alignment.CenterHorizontally))
+                    Text("限时 100 分钟 · 满分 100 分", fontSize = 12.sp, color = Gray400)
                     Spacer(Modifier.height(12.dp))
                     SmallButton(
                         text = "🏆 开始考试",
