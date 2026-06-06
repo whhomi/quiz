@@ -102,12 +102,6 @@ dependencies {
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 
-    // Apache POI for Excel parsing
-    implementation("org.apache.poi:poi-ooxml:5.2.5")
-
-    // XML stream reader for POI on Android
-    implementation("com.fasterxml:aalto-xml:1.3.2")
-
     // Gson
     implementation("com.google.code.gson:gson:2.10.1")
 }
