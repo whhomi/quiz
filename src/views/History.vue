@@ -60,16 +60,25 @@ function formatDuration(seconds) {
         class="bg-white rounded-xl p-4 border border-gray-100 hover:border-blue-200 hover:shadow-sm cursor-pointer transition"
       >
         <div class="flex items-center justify-between mb-2">
-          <span class="text-sm text-gray-400">{{ formatDate(record.timestamp) }}</span>
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-gray-400">{{ formatDate(record.timestamp) }}</span>
+            <span
+              v-if="record.mode === 'exam'"
+              class="px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700"
+            >考试</span>
+          </div>
           <span
             :class="[
               'px-2 py-0.5 rounded-full text-xs font-medium',
-              record.score >= 80 ? 'bg-green-100 text-green-700' :
-              record.score >= 60 ? 'bg-yellow-100 text-yellow-700' :
-              'bg-red-100 text-red-700'
+              record.mode === 'exam'
+                ? (record.score >= 60 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700')
+                : (record.score >= 80 ? 'bg-green-100 text-green-700' :
+                   record.score >= 60 ? 'bg-yellow-100 text-yellow-700' :
+                   'bg-red-100 text-red-700')
             ]"
           >
-            {{ record.score }}%
+            <template v-if="record.mode === 'exam'">{{ record.score }} / {{ record.maxScore || 100 }}分</template>
+            <template v-else>{{ record.score }}%</template>
           </span>
         </div>
         <div class="flex items-center gap-6 text-sm text-gray-500">

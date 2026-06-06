@@ -166,7 +166,8 @@ self.onmessage = (e) => {
       if (parsed.error) errors.push(`第 ${i+1} 行: ${parsed.error}（已导入，答案为空）`)
 
       const typeRaw = String(row[colMap.type] || '').trim()
-      const type = /多选/.test(typeRaw) ? 'multiple'
+      const type = /判断/.test(typeRaw) ? 'boolean'
+        : /多选/.test(typeRaw) ? 'multiple'
         : answer.length > 1 ? 'multiple' : 'single'
 
       const analysis = colMap.analysis !== undefined

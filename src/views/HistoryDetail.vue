@@ -10,7 +10,7 @@ const { getHistoryById, state } = useQuizStore()
 const recordId = route.params.id
 const record = computed(() => getHistoryById(recordId))
 
-const filter = ref('all') // 'all' | 'single' | 'multiple'
+const filter = ref('all') // 'all' | 'single' | 'multiple' | 'boolean'
 
 const filteredDetails = computed(() => {
   if (!record.value) return []
@@ -64,7 +64,8 @@ function goBack() {
       <div class="flex justify-center gap-8 mb-4">
         <div class="text-center">
           <div class="text-3xl font-bold" :class="record.score >= 60 ? 'text-green-600' : 'text-red-500'">
-            {{ record.score }}%
+            <template v-if="record.mode === 'exam'">{{ record.score }} / {{ record.maxScore || 100 }} 分</template>
+            <template v-else>{{ record.score }}%</template>
           </div>
           <div class="text-xs text-gray-400 mt-1">正确率</div>
         </div>
@@ -77,6 +78,23 @@ function goBack() {
           <div class="text-xs text-gray-400 mt-1">用时</div>
         </div>
       </div>
+
+      <!-- 考试模式：各题型细分 -->
+      <div v-if="record.mode === 'exam' && record.breakdown" class="grid grid-cols-3 gap-2 mb-4 text-xs">
+        <div class="bg-blue-50 rounded-lg p-2 text-center">
+          <div class="font-bold text-blue-600">{{ record.breakdown.single?.correct || 0 }}/{{ record.breakdown.single?.total || 0 }}</div>
+          <div class="text-gray-400">单选题</div>
+        </div>
+        <div class="bg-purple-50 rounded-lg p-2 text-center">
+          <div class="font-bold text-purple-600">{{ record.breakdown.multiple?.correct || 0 }}/{{ record.breakdown.multiple?.total || 0 }}</div>
+          <div class="text-gray-400">多选题</div>
+        </div>
+        <div class="bg-amber-50 rounded-lg p-2 text-center">
+          <div class="font-bold text-amber-600">{{ record.breakdown.boolean?.correct || 0 }}/{{ record.breakdown.boolean?.total || 0 }}</div>
+          <div class="text-gray-400">判断题</div>
+        </div>
+      </div>
+
       <div class="text-center text-xs text-gray-400 mb-4">
         已答 {{ record.answeredCount || record.details.length }} 题，跳过 {{ record.totalCount - (record.answeredCount || record.details.length) }} 题
       </div>
@@ -84,7 +102,7 @@ function goBack() {
       <!-- 过滤按钮 -->
       <div class="flex gap-2 justify-center">
         <button
-          v-for="f in [{k:'all',l:'全部'},{k:'single',l:'单选'},{k:'multiple',l:'多选'}]"
+          v-for="f in [{k:'all',l:'全部'},{k:'single',l:'单选'},{k:'multiple',l:'多选'},{k:'boolean',l:'判断'}]"
           :key="f.k"
           @click="filter = f.k"
           :class="[

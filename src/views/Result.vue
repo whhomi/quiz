@@ -48,13 +48,31 @@ function formatDuration(seconds) {
             :stroke="lastRecord.score >= 60 ? '#22c55e' : '#ef4444'"
             stroke-width="8"
             stroke-linecap="round"
-            :stroke-dasharray="`${lastRecord.score * 2.64} 264`"
+            :stroke-dasharray="lastRecord.mode === 'exam'
+              ? `${(lastRecord.score / (lastRecord.maxScore || 100)) * 264} 264`
+              : `${lastRecord.score * 2.64} 264`"
           />
         </svg>
         <div class="absolute inset-0 flex items-center justify-center">
           <span class="text-2xl font-bold" :class="lastRecord.score >= 60 ? 'text-green-600' : 'text-red-500'">
-            {{ lastRecord.score }}%
+            <template v-if="lastRecord.mode === 'exam'">{{ lastRecord.score }} / {{ lastRecord.maxScore || 100 }}</template>
+            <template v-else>{{ lastRecord.score }}%</template>
           </span>
+        </div>
+      </div>
+
+      <div v-if="lastRecord.mode === 'exam' && lastRecord.breakdown" class="grid grid-cols-3 gap-2 mb-4 text-xs">
+        <div class="bg-blue-50 rounded-lg p-2">
+          <div class="font-bold text-blue-600">{{ lastRecord.breakdown.single?.correct || 0 }}/{{ lastRecord.breakdown.single?.total || 0 }}</div>
+          <div class="text-gray-400">单选题</div>
+        </div>
+        <div class="bg-purple-50 rounded-lg p-2">
+          <div class="font-bold text-purple-600">{{ lastRecord.breakdown.multiple?.correct || 0 }}/{{ lastRecord.breakdown.multiple?.total || 0 }}</div>
+          <div class="text-gray-400">多选题</div>
+        </div>
+        <div class="bg-amber-50 rounded-lg p-2">
+          <div class="font-bold text-amber-600">{{ lastRecord.breakdown.boolean?.correct || 0 }}/{{ lastRecord.breakdown.boolean?.total || 0 }}</div>
+          <div class="text-gray-400">判断题</div>
         </div>
       </div>
 

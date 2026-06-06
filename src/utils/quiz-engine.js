@@ -44,10 +44,14 @@ function judge(userAnswer, correctAnswer) {
 
 /**
  * 创建答题会话
- * @param {object[]} questions - 题库中的题目数组（会先乱序）
+ * @param {object[]} questions - 题库中的题目数组
+ * @param {object} [options]
+ * @param {boolean} [options.random=true] - 是否乱序
+ * @param {string} [options.mode='practice'] - 'practice' | 'exam'
+ * @param {number|null} [options.timeLimit=null] - 限时（秒）
  * @returns {object} session 对象
  */
-function createSession(questions, { random = true } = {}) {
+function createSession(questions, { random = true, mode = 'practice', timeLimit = null } = {}) {
   const ordered = random ? shuffle(questions) : [...questions]
   const session = {
     id: generateId(),
@@ -56,13 +60,17 @@ function createSession(questions, { random = true } = {}) {
     answers: {},
     startTime: Date.now(),
     endTime: null,
-    isFinished: false
+    isFinished: false,
+    mode,
+    timeLimit
   }
   log.info('创建答题会话', {
     id: session.id,
     total: questions.length,
+    mode,
     singles: questions.filter(q => q.type === 'single').length,
-    multiples: questions.filter(q => q.type === 'multiple').length
+    multiples: questions.filter(q => q.type === 'multiple').length,
+    booleans: questions.filter(q => q.type === 'boolean').length
   })
   return session
 }
@@ -223,6 +231,31 @@ function getProgress(session) {
  * @returns {object} 符合 localStorage historyList 格式的记录
  */
 function buildHistoryRecord(session) {
+  if (session.mode === 'exam') {
+    const score = computeExamScore(session)
+    return {
+      id: session.id,
+      mode: 'exam',
+      timestamp: session.startTime,
+      totalCount: score.totalCount,
+      correctCount: score.correctCount,
+      answeredCount: score.answeredCount,
+      score: score.examScore,
+      maxScore: score.maxScore,
+      duration: score.duration,
+      breakdown: score.breakdown,
+      details: session.questions
+        .filter(q => session.answers[q.id])
+        .map(q => {
+          const ans = session.answers[q.id]
+          return {
+            questionId: q.id,
+            userAnswer: ans.userAnswer,
+            isCorrect: ans.isCorrect
+          }
+        })
+    }
+  }
   const { totalCount, correctCount, score, duration } = computeScore(session)
   const answeredCount = Object.keys(session.answers).length
   return {
@@ -247,6 +280,78 @@ function buildHistoryRecord(session) {
   }
 }
 
+/**
+ * 考试模式：按题型配额随机抽题
+ * @param {object[]} questions - 题库中的全部题目
+ * @returns {object[]} 抽选后的题目数组
+ */
+function selectExamQuestions(questions) {
+  const QUOTA = { single: 60, multiple: 100, boolean: 40 }
+  const singles = shuffle(questions.filter(q => q.type === 'single')).slice(0, QUOTA.single)
+  const multiples = shuffle(questions.filter(q => q.type === 'multiple')).slice(0, QUOTA.multiple)
+  const booleans = shuffle(questions.filter(q => q.type === 'boolean')).slice(0, QUOTA.boolean)
+  const combined = [...singles, ...multiples, ...booleans]
+  // 重新编号 ID（eq = exam question）
+  combined.forEach((q, i) => { q.id = `eq${i + 1}` })
+  log.info('考试抽题', {
+    singles: singles.length,
+    multiples: multiples.length,
+    booleans: booleans.length,
+    total: combined.length
+  })
+  return combined
+}
+
+/**
+ * 考试模式：计分（每题 0.5 分，满分 100）
+ * @param {object} session
+ * @returns {object} { totalCount, answeredCount, correctCount, examScore, maxScore, duration, breakdown }
+ */
+function computeExamScore(session) {
+  const answeredArr = Object.values(session.answers)
+  const totalCount = session.questions.length
+  const answeredCount = answeredArr.length
+  const correctCount = answeredArr.filter(a => a.isCorrect).length
+  const pointsPerQuestion = 0.5
+  const maxScore = totalCount * pointsPerQuestion
+  const examScore = correctCount * pointsPerQuestion
+
+  const breakdown = {}
+  ;['single', 'multiple', 'boolean'].forEach(type => {
+    const typeQuestions = session.questions.filter(q => q.type === type)
+    const typeCorrect = typeQuestions.filter(q => session.answers[q.id]?.isCorrect).length
+    breakdown[type] = {
+      total: typeQuestions.length,
+      correct: typeCorrect,
+      score: typeCorrect * pointsPerQuestion
+    }
+  })
+
+  const endTime = session.endTime || Date.now()
+  const duration = Math.floor((endTime - session.startTime) / 1000)
+  return { totalCount, answeredCount, correctCount, examScore, maxScore, duration, breakdown }
+}
+
+/**
+ * 考试模式：交卷
+ * @param {object} session
+ * @returns {object} 计分结果
+ */
+function finishExamSession(session) {
+  session.endTime = Date.now()
+  session.isFinished = true
+  const score = computeExamScore(session)
+  log.info('考试交卷', {
+    id: session.id,
+    correctCount: score.correctCount,
+    totalCount: score.totalCount,
+    examScore: score.examScore,
+    maxScore: score.maxScore,
+    duration: score.duration
+  })
+  return score
+}
+
 export {
   shuffle,
   createSession,
@@ -260,5 +365,8 @@ export {
   finishSession,
   getUnansweredCount,
   getProgress,
-  buildHistoryRecord
+  buildHistoryRecord,
+  selectExamQuestions,
+  computeExamScore,
+  finishExamSession
 }

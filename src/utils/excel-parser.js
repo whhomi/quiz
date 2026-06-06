@@ -279,7 +279,8 @@ function parseExcelFile(file) {
             }
 
             const typeRaw = String(row[colMap.type] || '').trim()
-            const type = /多选/.test(typeRaw) ? 'multiple'
+            const type = /判断/.test(typeRaw) ? 'boolean'
+              : /多选/.test(typeRaw) ? 'multiple'
               : answer.length > 1 ? 'multiple' : 'single'
 
             const analysis = colMap.analysis !== undefined
@@ -324,7 +325,8 @@ function parseExcelFile(file) {
           errors: errors.length,
           skipped: skippedEmpty,
           singles: questions.filter(q => q.type === 'single').length,
-          multiples: questions.filter(q => q.type === 'multiple').length
+          multiples: questions.filter(q => q.type === 'multiple').length,
+          booleans: questions.filter(q => q.type === 'boolean').length
         })
 
         if (errors.length > 0) {

@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { useQuizStore } from '../composables/useQuizStore'
 
 const router = useRouter()
-const { hasBank, totalCount, singleCount, multipleCount, importTime, importBank, startQuiz } = useQuizStore()
+const { hasBank, totalCount, singleCount, multipleCount, booleanCount, importTime, importBank, startQuiz, startExam, examQuotaStatus } = useQuizStore()
 
 const randomMode = ref(true)  // 默认随机
 
@@ -62,6 +62,11 @@ function confirmAndImport() {
 function triggerStart() {
   startQuiz(randomMode.value)
   router.push('/quiz')
+}
+
+function triggerExam() {
+  const ok = startExam()
+  if (ok) router.push('/quiz')
 }
 
 function formatTime(isoStr) {
@@ -124,24 +129,25 @@ function formatTime(isoStr) {
       <!-- 题库详情卡片 -->
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <h2 class="text-lg font-semibold text-gray-700 mb-4">📋 当前题库</h2>
-        <div class="grid grid-cols-2 gap-4 mb-4">
-          <div class="bg-blue-50 rounded-xl p-4 text-center">
-            <div class="text-3xl font-bold text-blue-600">{{ totalCount }}</div>
-            <div class="text-sm text-gray-500 mt-1">总题数</div>
+        <div class="grid grid-cols-4 gap-3 mb-4">
+          <div class="bg-blue-50 rounded-xl p-3 text-center">
+            <div class="text-2xl font-bold text-blue-600">{{ totalCount }}</div>
+            <div class="text-xs text-gray-500 mt-0.5">总题数</div>
           </div>
-          <div class="bg-green-50 rounded-xl p-4 text-center">
-            <div class="text-3xl font-bold text-green-600">{{ singleCount }}</div>
-            <div class="text-sm text-gray-500 mt-1">单选题</div>
+          <div class="bg-green-50 rounded-xl p-3 text-center">
+            <div class="text-2xl font-bold text-green-600">{{ singleCount }}</div>
+            <div class="text-xs text-gray-500 mt-0.5">单选</div>
           </div>
-          <div class="bg-purple-50 rounded-xl p-4 text-center">
-            <div class="text-3xl font-bold text-purple-600">{{ multipleCount }}</div>
-            <div class="text-sm text-gray-500 mt-1">多选题</div>
+          <div class="bg-purple-50 rounded-xl p-3 text-center">
+            <div class="text-2xl font-bold text-purple-600">{{ multipleCount }}</div>
+            <div class="text-xs text-gray-500 mt-0.5">多选</div>
           </div>
-          <div class="bg-gray-50 rounded-xl p-4 text-center">
-            <div class="text-lg font-semibold text-gray-600">{{ formatTime(importTime) }}</div>
-            <div class="text-sm text-gray-500 mt-1">导入时间</div>
+          <div class="bg-amber-50 rounded-xl p-3 text-center">
+            <div class="text-2xl font-bold text-amber-600">{{ booleanCount }}</div>
+            <div class="text-xs text-gray-500 mt-0.5">判断</div>
           </div>
         </div>
+        <div class="text-center text-xs text-gray-400">{{ formatTime(importTime) }} 导入</div>
       </div>
 
       <!-- 练习模式切换 -->
@@ -156,6 +162,36 @@ function formatTime(isoStr) {
           :class="!randomMode ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500'"
           class="px-4 py-2 rounded-lg text-sm font-medium transition"
         >📋 顺序</button>
+      </div>
+
+      <!-- 模拟考试 -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4">📝 模拟考试</h2>
+        <div class="grid grid-cols-3 gap-3 mb-4 text-center text-sm">
+          <div class="bg-blue-50 rounded-xl p-3">
+            <div class="font-bold text-blue-600">{{ examQuotaStatus?.available?.single || 0 }}/60</div>
+            <div class="text-xs text-gray-500 mt-0.5">单选题 × 0.5分</div>
+          </div>
+          <div class="bg-purple-50 rounded-xl p-3">
+            <div class="font-bold text-purple-600">{{ examQuotaStatus?.available?.multiple || 0 }}/100</div>
+            <div class="text-xs text-gray-500 mt-0.5">多选题 × 0.5分</div>
+          </div>
+          <div class="bg-amber-50 rounded-xl p-3">
+            <div class="font-bold text-amber-600">{{ examQuotaStatus?.available?.boolean || 0 }}/40</div>
+            <div class="text-xs text-gray-500 mt-0.5">判断题 × 0.5分</div>
+          </div>
+        </div>
+        <div v-if="examQuotaStatus?.warnings?.length > 0" class="mb-4 space-y-1">
+          <p v-for="(w, i) in examQuotaStatus.warnings" :key="i" class="text-xs text-amber-600">⚠️ {{ w }}</p>
+        </div>
+        <div class="text-center text-xs text-gray-400 mb-4">限时 100 分钟，满分 100 分</div>
+        <button
+          @click="triggerExam"
+          :disabled="!examQuotaStatus?.canStart"
+          class="w-full py-4 bg-amber-600 text-white rounded-xl font-medium text-lg hover:bg-amber-700 active:bg-amber-800 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-amber-200"
+        >
+          🏆 开始考试
+        </button>
       </div>
 
       <!-- 操作按钮 -->

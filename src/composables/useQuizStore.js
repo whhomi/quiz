@@ -17,7 +17,9 @@ import {
   getProgress,
   getCurrentQuestion,
   isCurrentAnswered,
-  buildHistoryRecord
+  buildHistoryRecord,
+  selectExamQuestions,
+  finishExamSession
 } from '../utils/quiz-engine'
 import { createLogger } from '../utils/logger'
 
@@ -46,6 +48,9 @@ const singleCount = computed(() =>
 )
 const multipleCount = computed(() =>
   state.questionBank?.questions?.filter(q => q.type === 'multiple').length || 0
+)
+const booleanCount = computed(() =>
+  state.questionBank?.questions?.filter(q => q.type === 'boolean').length || 0
 )
 const importTime = computed(() => state.questionBank?.importTime || '')
 
@@ -156,15 +161,17 @@ function finalizeImport(bank, warnings, endTimer) {
   state.questionBank = bank
   state.historyList = []
   endTimer()
+  const booleanLen = bank.questions.filter(q => q.type === 'boolean').length
   log.info('导入完成', {
     total: bank.total,
     singles: bank.questions.filter(q => q.type === 'single').length,
     multiples: bank.questions.filter(q => q.type === 'multiple').length,
+    booleans: booleanLen,
     warnings: warnings.length
   })
   return {
     success: true,
-    message: `成功导入 ${bank.total} 道题（单选 ${bank.questions.filter(q => q.type === 'single').length}，多选 ${bank.questions.filter(q => q.type === 'multiple').length}）`,
+    message: `成功导入 ${bank.total} 道题（单选 ${bank.questions.filter(q => q.type === 'single').length}，多选 ${bank.questions.filter(q => q.type === 'multiple').length}${booleanLen ? `，判断 ${booleanLen}` : ''}）`,
     warnings: warnings || []
   }
 }
@@ -262,6 +269,17 @@ function finishQuiz() {
     log.warn('交卷失败: 无会话')
     return null
   }
+  if (state.session.mode === 'exam') {
+    const result = finishExamSession(state.session)
+    const record = buildHistoryRecord(state.session)
+    storage.addHistory(record)
+    state.historyList = storage.getHistoryList()
+    const session = state.session
+    state.session = null
+    state.lastJudgment = null
+    log.info('考试结束', { correct: result.correctCount, total: result.totalCount, score: result.examScore })
+    return { score: result, record }
+  }
   const result = finishSession(state.session)
   const record = buildHistoryRecord(state.session)
   storage.addHistory(record)
@@ -278,6 +296,56 @@ function endQuiz() {
   state.lastJudgment = null
 }
 
+// ---- 考试模式 ----
+
+/**
+ * 检查考试配额是否满足
+ */
+const examQuotaStatus = computed(() => {
+  if (!state.questionBank) return null
+  const qs = state.questionBank.questions
+  const available = {
+    single: qs.filter(q => q.type === 'single').length,
+    multiple: qs.filter(q => q.type === 'multiple').length,
+    boolean: qs.filter(q => q.type === 'boolean').length
+  }
+  const required = { single: 60, multiple: 100, boolean: 40 }
+  const warnings = []
+  if (available.single < 60) warnings.push(`单选题不足60题（当前${available.single}题），将使用全部可用题目`)
+  if (available.multiple < 100) warnings.push(`多选题不足100题（当前${available.multiple}题），将使用全部可用题目`)
+  if (available.boolean < 40) warnings.push(`判断题不足40题（当前${available.boolean}题），将使用全部可用题目`)
+  const totalAvailable = available.single + available.multiple + available.boolean
+  const canStart = totalAvailable > 0
+  return { canStart, available, required, warnings, totalAvailable }
+})
+
+/**
+ * 开始考试
+ */
+function startExam() {
+  if (!state.questionBank) {
+    log.warn('开始考试失败: 无题库')
+    return false
+  }
+  const rawBank = toRaw(state.questionBank)
+  const examQuestions = selectExamQuestions(rawBank.questions)
+  const session = createSession(examQuestions, {
+    random: false,
+    mode: 'exam',
+    timeLimit: 6000 // 100 分钟
+  })
+  markRaw(session.questions)
+  state.session = session
+  state.lastJudgment = null
+  log.info('开始考试', {
+    sessionId: session.id,
+    total: session.questions.length
+  })
+  return true
+}
+
+const isExamMode = computed(() => state.session?.mode === 'exam')
+
 // ---- 导出 ----
 export function useQuizStore() {
   return {
@@ -287,6 +355,7 @@ export function useQuizStore() {
     totalCount,
     singleCount,
     multipleCount,
+    booleanCount,
     importTime,
 
     // 题库操作
@@ -307,6 +376,11 @@ export function useQuizStore() {
     jumpToQuestion,
     finishQuiz,
     endQuiz,
+
+    // 考试模式
+    startExam,
+    isExamMode,
+    examQuotaStatus,
 
     // 引擎函数透传（视图可直接用）
     getCurrentQuestion,
