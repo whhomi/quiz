@@ -91,22 +91,24 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
 
     fun toggleOption(index: Int) {
         val q = _currentQuestion.value ?: return
+        // 考试模式下已答题不可修改
+        if (_session?.mode == QuizMode.EXAM && _judgment.value != null) return
         val current = _selectedAnswers.value.toMutableList()
         if (q.type == QuestionType.SINGLE || q.type == QuestionType.BOOLEAN) {
+            // 单选/判断题：点击即自动提交并显示反馈
             _selectedAnswers.value = listOf(index)
-            if (_session?.mode == QuizMode.EXAM) {
-                val s = _session ?: return
-                QuizEngine.submitAnswer(s, listOf(index))
-                val isCorrect = QuizEngine.judge(listOf(index), q.getAnswerList())
-                _judgment.value = Judgment(
-                    isCorrect = isCorrect,
-                    correctAnswer = q.getAnswerList(),
-                    questionId = q.id
-                )
-                refreshFromSession()
-                recordWrongQuestion(q.id, isCorrect)
-            }
+            val s = _session ?: return
+            QuizEngine.submitAnswer(s, listOf(index))
+            val isCorrect = QuizEngine.judge(listOf(index), q.getAnswerList())
+            _judgment.value = Judgment(
+                isCorrect = isCorrect,
+                correctAnswer = q.getAnswerList(),
+                questionId = q.id
+            )
+            refreshFromSession()
+            recordWrongQuestion(q.id, isCorrect)
         } else {
+            // 多选题：先记录选中状态，等待点击"提交答案"
             if (index in current) current.remove(index) else current.add(index)
             _selectedAnswers.value = current
             if (_session?.mode == QuizMode.EXAM) {
@@ -136,20 +138,6 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
 
     fun goNext() {
         val s = _session ?: return
-        val q = QuizEngine.getCurrentQuestion(s)
-        if (q != null && s.mode == QuizMode.PRACTICE && (q.type == QuestionType.SINGLE || q.type == QuestionType.BOOLEAN)) {
-            val selected = _selectedAnswers.value
-            if (selected.isNotEmpty() && !s.answers.containsKey(q.id)) {
-                QuizEngine.submitAnswer(s, selected)
-                val isCorrect = QuizEngine.judge(selected, q.getAnswerList())
-                _judgment.value = Judgment(
-                    isCorrect = isCorrect,
-                    correctAnswer = q.getAnswerList(),
-                    questionId = q.id
-                )
-                recordWrongQuestion(q.id, isCorrect)
-            }
-        }
         val hasMore = QuizEngine.nextQuestion(s)
         if (!hasMore) {
             finishQuiz()

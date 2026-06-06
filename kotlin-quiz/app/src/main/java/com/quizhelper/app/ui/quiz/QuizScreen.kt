@@ -194,7 +194,7 @@ fun QuizScreen(
                     showResult = isAnswered,
                     isMultipleChoice = isMulti,
                     onClick = {
-                        if (!isAnswered || isExam) {
+                        if (!isAnswered || (!isExam && !isMulti)) {
                             viewModel.toggleOption(idx)
                         }
                     },
@@ -251,20 +251,6 @@ fun QuizScreen(
                 }
             }
 
-            // Analysis (when navigating back to already-answered question)
-            if (isAnswered && question!!.analysis.isNotBlank() && isExam) {
-                Spacer(Modifier.height(8.dp))
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = Blue50.copy(alpha = 0.5f))
-                ) {
-                    Column(Modifier.padding(12.dp)) {
-                        Text("💡 解析", fontSize = 11.sp, color = Blue500, fontWeight = FontWeight.Medium)
-                        Text(question!!.analysis, fontSize = 14.sp, color = Gray700, lineHeight = 22.sp)
-                    }
-                }
-            }
         }
 
         // Bottom bar
