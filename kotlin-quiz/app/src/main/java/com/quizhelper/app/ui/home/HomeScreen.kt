@@ -119,7 +119,7 @@ fun HomeScreen(
                 colors = CardDefaults.cardColors(containerColor = Blue50.copy(alpha = 0.5f))
             ) {
                 Text(
-                    "🎲 考试或练习完成后，随机出现彩蛋（约8%概率）",
+                    "🎲 想要彩蛋就要多练习或者多考试哦！（约8%概率出现）",
                     modifier = Modifier.padding(14.dp),
                     fontSize = 12.sp,
                     color = Blue600,
