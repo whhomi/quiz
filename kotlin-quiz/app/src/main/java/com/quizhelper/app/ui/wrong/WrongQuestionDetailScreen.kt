@@ -35,9 +35,12 @@ fun WrongQuestionDetailScreen(
                 Spacer(Modifier.height(8.dp))
                 Text("题目未找到", color = Gray400, fontSize = 14.sp)
                 Spacer(Modifier.height(16.dp))
-                TextButton(onClick = { navController.popBackStack() }) {
-                    Text("返回错题集", color = Blue600)
-                }
+                SecondaryButton(
+                    text = "返回错题集",
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
+                    textColor = Blue600
+                )
             }
         }
         return
@@ -50,9 +53,7 @@ fun WrongQuestionDetailScreen(
             .padding(16.dp)
     ) {
         // Back button
-        TextButton(onClick = { navController.popBackStack() }) {
-            Text("← 返回", color = Gray500)
-        }
+        BackButton(onClick = { navController.popBackStack() })
 
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -142,14 +143,12 @@ fun WrongQuestionDetailScreen(
 
                 // Remove button
                 Spacer(Modifier.height(12.dp))
-                OutlinedButton(
+                SecondaryButton(
+                    text = "从错题集中移除",
                     onClick = { viewModel.remove(question.id); navController.popBackStack() },
-                    modifier = Modifier.fillMaxWidth().height(44.dp),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Red500)
-                ) {
-                    Text("从错题集中移除", fontSize = 14.sp)
-                }
+                    modifier = Modifier.fillMaxWidth(),
+                    textColor = Red500
+                )
 
                 // Analysis
                 if (question.analysis.isNotBlank()) {
@@ -175,11 +174,11 @@ fun WrongQuestionDetailScreen(
         }
 
         Spacer(Modifier.height(16.dp))
-        TextButton(
+        SecondaryButton(
+            text = "返回错题集",
             onClick = { navController.popBackStack() },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
-            Text("返回错题集", color = Blue600)
-        }
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            textColor = Blue600
+        )
     }
 }

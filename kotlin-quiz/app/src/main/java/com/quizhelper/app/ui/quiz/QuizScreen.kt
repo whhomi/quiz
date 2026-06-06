@@ -67,6 +67,13 @@ fun QuizScreen(
     }
 
     if (isFinished && result != null) {
+        var showEncouragementDialog by remember { mutableStateOf(true) }
+        if (showEncouragementDialog) {
+            EncouragementDialog(
+                result = result!!,
+                onDismiss = { showEncouragementDialog = false }
+            )
+        }
         ResultContent(
             result = result!!,
             onViewDetail = {
@@ -134,13 +141,23 @@ fun QuizScreen(
                     )
                 }
                 if (isExam) {
-                    TextButton(onClick = { viewModel.finishQuiz() }) {
-                        Text("交卷", color = Amber600, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    }
+                    SmallButton(
+                        text = "交卷",
+                        onClick = { viewModel.finishQuiz() },
+                        containerColor = Amber500,
+                        textColor = White,
+                        fontSize = 13,
+                        modifier = Modifier.height(36.dp)
+                    )
                 }
-                TextButton(onClick = { showGrid = !showGrid }) {
-                    Text(if (showGrid) "收起" else "题号", fontSize = 12.sp)
-                }
+                SmallButton(
+                    text = if (showGrid) "收起" else "题号",
+                    onClick = { showGrid = !showGrid },
+                    containerColor = Gray100,
+                    textColor = Gray600,
+                    fontSize = 13,
+                    modifier = Modifier.height(36.dp)
+                )
             },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = White)
         )
@@ -414,7 +431,6 @@ fun ResultContent(
     onRetry: () -> Unit,
     onHome: () -> Unit
 ) {
-    val encouragement = remember { Encouragement.random() }
     var easterEggMessage by remember { mutableStateOf<String?>(null) }
 
     Column(
@@ -425,98 +441,70 @@ fun ResultContent(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(24.dp))
 
-        if (result.mode == QuizMode.EXAM) {
-            // 彩蛋触发：点击考试完成图标
-            Text(
-                "🏆",
-                fontSize = 48.sp,
-                modifier = Modifier.clickable {
-                    if (Encouragement.checkEasterEgg()) {
-                        easterEggMessage = Encouragement.EASTER_EGG_MESSAGE
-                    }
-                }
-            )
-            Text("考试完成！", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Gray800)
-            Spacer(Modifier.height(16.dp))
-
-            val isPass = result.correctRate >= 60
-            ScoreCircle(
-                score = result.score,
-                maxScore = result.maxScore ?: 100.0
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            Text(
-                "正确率 ${result.correctRate.toInt()}%",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = if (isPass) Green600 else Red500
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            if (result.breakdown != null) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    BreakdownItem("单选题", result.breakdown.single, Blue600, Blue50)
-                    BreakdownItem("多选题", result.breakdown.multiple, Purple600, Purple50)
-                    BreakdownItem("判断题", result.breakdown.boolean, Amber600, Amber50)
+        // Title with easter egg trigger
+        val titleIcon = if (result.mode == QuizMode.EXAM) "🏆" else "🎉"
+        Text(
+            titleIcon,
+            fontSize = 40.sp,
+            modifier = Modifier.clickable {
+                if (Encouragement.checkEasterEgg()) {
+                    easterEggMessage = Encouragement.EASTER_EGG_MESSAGE
                 }
             }
+        )
+        Text(
+            if (result.mode == QuizMode.EXAM) "考试详情" else "练习详情",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            color = Gray800
+        )
+        Spacer(Modifier.height(16.dp))
 
-            Spacer(Modifier.height(16.dp))
-        } else {
-            // 彩蛋触发：点击练习完成图标
-            Text(
-                "🎉",
-                fontSize = 48.sp,
-                modifier = Modifier.clickable {
-                    if (Encouragement.checkEasterEgg()) {
-                        easterEggMessage = Encouragement.EASTER_EGG_MESSAGE
-                    }
-                }
-            )
-            Text("练习完成！", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Gray800)
-            Spacer(Modifier.height(16.dp))
-
-            ScoreCircle(
-                score = result.score,
-                maxScore = result.maxScore ?: result.totalCount.toDouble()
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            Text(
-                "正确率 ${result.correctRate.toInt()}%",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = if (result.correctRate >= 60) Green600 else Red500
-            )
-
-            Spacer(Modifier.height(16.dp))
-        }
-
-        // Encouragement message
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = if (easterEggMessage != null) Amber50 else Blue50.copy(alpha = 0.6f)
-            )
-        ) {
-            Text(
-                easterEggMessage ?: "💪 $encouragement",
-                modifier = Modifier.padding(16.dp),
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium,
-                color = if (easterEggMessage != null) Amber700 else Blue700,
-                textAlign = TextAlign.Center
-            )
-        }
+        val isPass = result.correctRate >= 60
+        ScoreCircle(
+            score = result.score,
+            maxScore = result.maxScore ?: if (result.mode == QuizMode.EXAM) 100.0 else result.totalCount.toDouble()
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "正确率 ${result.correctRate.toInt()}%",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            color = if (isPass) Green600 else Red500
+        )
 
         Spacer(Modifier.height(16.dp))
+
+        // Easter egg banner
+        if (easterEggMessage != null) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Amber50)
+            ) {
+                Text(
+                    easterEggMessage!!,
+                    modifier = Modifier.padding(16.dp),
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Amber700,
+                    textAlign = TextAlign.Center
+                )
+            }
+            Spacer(Modifier.height(16.dp))
+        }
+
+        // Exam breakdown
+        if (result.mode == QuizMode.EXAM && result.breakdown != null) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                BreakdownItem("单选题", result.breakdown.single, Blue600, Blue50)
+                BreakdownItem("多选题", result.breakdown.multiple, Purple600, Purple50)
+                BreakdownItem("判断题", result.breakdown.boolean, Amber600, Amber50)
+            }
+            Spacer(Modifier.height(16.dp))
+        }
 
         // Stats row
         Row(
@@ -532,11 +520,17 @@ fun ResultContent(
         Spacer(Modifier.height(24.dp))
 
         PrimaryButton(text = "📋 查看详情", onClick = onViewDetail)
-        Spacer(Modifier.height(8.dp))
-        SecondaryButton(text = "🔄 再练一次", onClick = onRetry)
-        Spacer(Modifier.height(8.dp))
-        TextButton(onClick = onHome) {
-            Text("返回首页", color = Gray400, fontSize = 14.sp)
+        Spacer(Modifier.height(10.dp))
+        SecondaryButton(text = "🔄 再练一次", onClick = onRetry, textColor = Blue600)
+        Spacer(Modifier.height(10.dp))
+        OutlinedButton(
+            onClick = onHome,
+            modifier = Modifier.fillMaxWidth().height(48.dp),
+            shape = RoundedCornerShape(12.dp),
+            border = BorderStroke(1.dp, Gray200),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = Gray400)
+        ) {
+            Text("返回首页", fontSize = 14.sp)
         }
     }
 }

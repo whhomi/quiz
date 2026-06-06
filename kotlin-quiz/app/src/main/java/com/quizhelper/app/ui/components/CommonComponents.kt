@@ -5,7 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -15,7 +15,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.quizhelper.app.data.model.QuestionType
+import com.quizhelper.app.data.model.QuizResult
 import com.quizhelper.app.ui.theme.*
+import com.quizhelper.app.util.Encouragement
 
 @Composable
 fun QuestionTypeTag(type: QuestionType, modifier: Modifier = Modifier) {
@@ -279,17 +281,102 @@ fun ConfirmDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(title, fontWeight = FontWeight.Bold) },
-        text = { Text(message, fontSize = 14.sp) },
+        title = { Text(title, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Gray800) },
+        text = { Text(message, fontSize = 14.sp, color = Gray600) },
         confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(confirmText, color = Red500)
-            }
+            SmallButton(
+                text = confirmText,
+                onClick = onConfirm,
+                containerColor = Red500,
+                textColor = White,
+                fontSize = 14,
+                modifier = Modifier.width(80.dp)
+            )
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("取消", color = Gray500)
+            OutlinedButton(
+                onClick = onDismiss,
+                modifier = Modifier.height(40.dp).width(80.dp),
+                shape = RoundedCornerShape(10.dp),
+                border = BorderStroke(1.dp, Gray300),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Gray500)
+            ) {
+                Text("取消", fontSize = 14.sp)
             }
+        }
+    )
+}
+
+@Composable
+fun EncouragementDialog(
+    result: QuizResult,
+    onDismiss: () -> Unit
+) {
+    val encouragement = remember { Encouragement.random() }
+    val isPass = result.correctRate >= 60
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(20.dp),
+        title = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    if (result.mode.name == "EXAM") "🏆" else "🎉",
+                    fontSize = 48.sp
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    if (result.mode.name == "EXAM") "考试完成！" else "练习完成！",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Gray800
+                )
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                ScoreCircle(
+                    score = result.score,
+                    maxScore = result.maxScore ?: if (result.mode.name == "EXAM") 100.0 else result.totalCount.toDouble(),
+                    modifier = Modifier.size(100.dp)
+                )
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    "正确率 ${result.correctRate.toInt()}%",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = if (isPass) Green600 else Red500
+                )
+                Spacer(Modifier.height(16.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = Blue50)
+                ) {
+                    Text(
+                        "💪 $encouragement",
+                        modifier = Modifier.padding(16.dp),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Blue700,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            PrimaryButton(
+                text = "查看详情",
+                onClick = onDismiss,
+                modifier = Modifier.fillMaxWidth(),
+                fontSize = 15
+            )
         }
     )
 }

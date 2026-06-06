@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.quizhelper.app.data.model.*
-import com.quizhelper.app.ui.components.ScoreCircle
+import com.quizhelper.app.ui.components.*
 import com.quizhelper.app.ui.theme.*
 import com.quizhelper.app.util.TimeUtils
 
@@ -57,9 +57,7 @@ fun HistoryDetailScreen(
             .padding(16.dp)
     ) {
         // Back button
-        TextButton(onClick = { navController.popBackStack() }) {
-            Text("← 返回", color = Gray500)
-        }
+        BackButton(text = "← 返回列表", onClick = { navController.popBackStack() })
 
         // Score overview
         Card(
@@ -301,12 +299,12 @@ fun HistoryDetailScreen(
         }
 
         Spacer(Modifier.height(8.dp))
-        TextButton(
+        SecondaryButton(
+            text = "返回历史列表",
             onClick = { navController.popBackStack() },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
-            Text("返回历史列表", color = Blue600)
-        }
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            textColor = Blue600
+        )
     }
 }
 
