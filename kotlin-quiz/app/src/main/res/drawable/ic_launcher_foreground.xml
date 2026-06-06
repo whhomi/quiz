@@ -5,40 +5,30 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- 打开的书本 -->
+    <!-- 页面左弧 -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M30,30 L54,24 L78,30 L78,74 L54,80 L30,74 Z"/>
+        android:pathData="M32,28 L54,24 L76,28 L76,76 L54,82 L32,76 Z"/>
 
-    <!-- 书脊线 -->
+    <!-- 书脊 -->
     <path
         android:strokeColor="#397DFF"
         android:strokeWidth="2"
         android:fillColor="@android:color/transparent"
-        android:pathData="M54,25 L54,79"/>
+        android:pathData="M54,25 L54,80"/>
 
     <!-- 左页文字线 -->
     <path
         android:strokeColor="#BFDBFE"
         android:strokeWidth="2"
         android:strokeLineCap="round"
-        android:pathData="M36,42 L50,42 M36,52 L50,52 M36,62 L48,62"/>
+        android:pathData="M37,42 L48,42 M37,52 L48,52 M37,62 L46,62"/>
 
     <!-- 右页文字线 -->
     <path
         android:strokeColor="#BFDBFE"
         android:strokeWidth="2"
         android:strokeLineCap="round"
-        android:pathData="M58,42 L72,42 M58,52 L72,52 M60,62 L72,62"/>
-
-    <!-- 笔 -->
-    <path
-        android:fillColor="#374151"
-        android:pathData="M76,60 L91,45 L88,42 L73,57 Z"/>
-
-    <!-- 笔尖 -->
-    <path
-        android:fillColor="#111827"
-        android:pathData="M90,44 L91,45 L86,49 Z"/>
+        android:pathData="M60,42 L71,42 M60,52 L71,52 M62,62 L71,62"/>
 
 </vector>
