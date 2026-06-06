@@ -1,83 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- 超大圆角方形底（白） -->
+    <!-- 超大圆角方形白色底框（iOS现代图标风格） -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M16,10 C23,10 30,10 54,10 C78,10 85,10 92,10 C98,10 98,16 98,24 C98,30 98,40 98,54 C98,68 98,78 98,84 C98,92 92,98 84,98 C78,98 68,98 54,98 C40,98 30,98 24,98 C16,98 10,92 10,84 C10,78 10,68 10,54 C10,40 10,30 10,24 C10,16 16,10 24,10 Z" />
+        android:pathData="M12,6 C20,6 30,6 54,6 C78,6 88,6 96,6 C102,6 102,12 102,20 C102,30 102,40 102,54 C102,68 102,78 102,88 C102,96 96,102 88,102 C78,102 68,102 54,102 C40,102 30,102 20,102 C12,102 6,96 6,88 C6,78 6,68 6,54 C6,40 6,30 6,20 C6,12 12,6 20,6 Z" />
 
-    <!-- 打开的书 - 左页 -->
+    <!-- 打开的书 - 左页（极光蓝 #4A90E2 低透明度） -->
     <path
         android:fillColor="#4A90E2"
-        android:pathData="M38,35 L54,28 L54,70 L38,77 Z"
-        android:alpha="0.15" />
+        android:fillAlpha="0.12"
+        android:pathData="M40,33 L54,27 L54,73 L40,79 Z" />
 
-    <!-- 打开的书 - 右页 -->
+    <!-- 打开的书 - 右页（科技紫 #7B68EE 低透明度） -->
     <path
         android:fillColor="#7B68EE"
-        android:pathData="M54,28 L70,35 L70,77 L54,70 Z"
-        android:alpha="0.15" />
+        android:fillAlpha="0.12"
+        android:pathData="M54,27 L68,33 L68,79 L54,73 Z" />
 
     <!-- 书的轮廓线 -->
     <path
         android:strokeColor="#4A90E2"
-        android:strokeWidth="1.5"
+        android:strokeWidth="1.8"
         android:fillColor="@android:color/transparent"
         android:strokeLineJoin="round"
-        android:pathData="M38,35 L54,28 L70,35" />
+        android:pathData="M40,33 L54,27 L68,33" />
     <path
-        android:strokeColor="#4A90E2"
-        android:strokeWidth="1.5"
+        android:strokeColor="#7B68EE"
+        android:strokeWidth="1.8"
         android:fillColor="@android:color/transparent"
         android:strokeLineJoin="round"
-        android:pathData="M38,77 L54,70 L70,77" />
+        android:pathData="M40,79 L54,73 L68,79" />
     <path
         android:strokeColor="#4A90E2"
-        android:strokeWidth="1.5"
+        android:strokeWidth="1.8"
         android:fillColor="@android:color/transparent"
-        android:pathData="M54,28 L54,70" />
+        android:pathData="M54,27 L54,73" />
 
-    <!-- 左页对勾 ✓（替代文字线） -->
+    <!-- 左页：对勾 ✓ 答题正确标记 -->
     <path
         android:fillColor="#4A90E2"
-        android:pathData="M40,48 L44,52 L52,42 L50,40 L44,49 L42,46 Z" />
+        android:pathData="M42,52 L46,56 L52,48 L50,46 L46,53 L44,50 Z" />
 
-    <!-- 右页答题卡方格 -->
+    <!-- 右页：答题卡方格（三个选项矩形） -->
     <path
         android:strokeColor="#7B68EE"
-        android:strokeWidth="1.2"
+        android:strokeWidth="1.5"
         android:fillColor="@android:color/transparent"
-        android:pathData="M58,46 L66,46" />
-    <path
-        android:strokeColor="#7B68EE"
-        android:strokeWidth="1.2"
-        android:fillColor="@android:color/transparent"
-        android:pathData="M58,52 L66,52" />
-    <path
-        android:strokeColor="#7B68EE"
-        android:strokeWidth="1.2"
-        android:fillColor="@android:color/transparent"
-        android:pathData="M58,58 L66,58" />
-    <!-- 涂黑的选项方块（B选项被涂满） -->
+        android:pathData="M58,44 L66,44 M58,50 L66,50 M58,56 L66,56 M58,62 L66,62" />
+
+    <!-- B选项被涂黑 -->
     <path
         android:fillColor="#7B68EE"
-        android:pathData="M58,52 L62,52 L62,52 L58,52 Z" />
+        android:fillAlpha="0.8"
+        android:pathData="M58,48 L62,48 L62,50 L58,50 Z" />
 
-    <!-- 悬浮的钢笔尖 -->
+    <!-- 悬空的极细钢笔尖 -->
     <path
         android:fillColor="#374151"
-        android:pathData="M64,18 L68,12 L66,10 L60,16 Z" />
+        android:pathData="M66,16 L72,10 L70,8 L62,14 Z" />
     <path
         android:fillColor="#1F2937"
-        android:pathData="M68,12 L67,11 L66,13 Z" />
+        android:pathData="M71,9 L72,10 L69,13 Z" />
 
-    <!-- 笔尖处发光星芒 -->
+    <!-- 笔尖处金色星芒 -->
     <path
         android:fillColor="#FFD700"
-        android:pathData="M56,12 L57,14 L59,15 L57,16 L56,18 L55,16 L53,15 L55,14 Z" />
+        android:pathData="M58,10 L59,12 L61,13 L59,14 L58,16 L57,14 L55,13 L57,12 Z" />
 
 </vector>
