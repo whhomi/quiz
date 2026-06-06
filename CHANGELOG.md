@@ -5,6 +5,9 @@
 ### 🚀 新增功能
 - 关于页新增「更新日志」按钮，弹窗展示完整CHANGELOG
 
+### 🔧 CI
+- 修复GitHub Actions release构建失败：生成debug keystore后签名
+
 ## [2.2.7] — 2026-06-07 02:44
 
 ### 🎨 UI

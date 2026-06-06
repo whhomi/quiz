@@ -63,6 +63,11 @@ jobs:
       - name: Grant execute permission for Gradle
         run: chmod +x kotlin-quiz/gradlew
 
+      - name: Generate debug keystore for signing
+        run: |
+          mkdir -p ~/.android
+          keytool -genkey -v -keystore ~/.android/debug.keystore \n            -alias androiddebugkey -keyalg RSA -keysize 2048 \n            -validity 10000 -storepass android -keypass android \n            -dname "CN=, OU=, O=, L=, S=, C="
+
       - name: Build Debug APK
         run: cd kotlin-quiz && ./gradlew assembleDebug
 
