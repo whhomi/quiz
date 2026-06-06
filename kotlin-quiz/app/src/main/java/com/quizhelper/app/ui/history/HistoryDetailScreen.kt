@@ -83,13 +83,8 @@ fun HistoryDetailScreen(
                 ) {
                     // Score (point-based)
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        val scoreText = if (r.mode == "exam" && r.maxScore != null) {
-                            "${r.score.toInt()} / ${r.maxScore.toInt()} 分"
-                        } else {
-                            "${r.score.toInt()} / ${r.totalCount} 分"
-                        }
                         Text(
-                            scoreText,
+                            "${r.score.toInt()} 分",
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (r.score >= 60) Green600 else Red500
@@ -115,7 +110,7 @@ fun HistoryDetailScreen(
                             fontWeight = FontWeight.Bold,
                             color = Gray700
                         )
-                        Text("正确 / 总题", fontSize = 11.sp, color = Gray400)
+                        Text("正确 / 题", fontSize = 11.sp, color = Gray400)
                     }
                     // Duration
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {

@@ -110,8 +110,7 @@ private fun HistoryCard(record: HistoryRecord, onClick: () -> Unit) {
                     color = bgColor
                 ) {
                     Text(
-                        if (record.mode == "exam") "${record.score.toInt()} / ${record.maxScore?.toInt() ?: 100}分"
-                        else "${record.score.toInt()} / ${record.totalCount}题",
+                        "${record.score.toInt()}分",
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         color = scoreColor,
@@ -125,6 +124,12 @@ private fun HistoryCard(record: HistoryRecord, onClick: () -> Unit) {
             ) {
                 Text(
                     "正确 ${record.correctCount}/${record.answeredCount}",
+                    fontSize = 13.sp,
+                    color = Gray500
+                )
+                val rate = if (record.totalCount > 0) (record.correctCount.toDouble() / record.totalCount * 100).toInt() else 0
+                Text(
+                    "正确率 ${rate}%",
                     fontSize = 13.sp,
                     color = Gray500
                 )

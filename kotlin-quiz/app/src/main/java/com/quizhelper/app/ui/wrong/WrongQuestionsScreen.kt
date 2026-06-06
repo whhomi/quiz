@@ -139,6 +139,9 @@ fun WrongQuestionsScreen(
                 items(questions, key = { it.id }) { question ->
                     WrongQuestionCard(
                         question = question,
+                        onClick = {
+                            navController.navigate(Screen.WrongQuestionDetail.createRoute(question.id))
+                        },
                         onRemove = { viewModel.remove(question.id) }
                     )
                 }
@@ -163,10 +166,13 @@ fun WrongQuestionsScreen(
 @Composable
 private fun WrongQuestionCard(
     question: Question,
+    onClick: () -> Unit,
     onRemove: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = White),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)

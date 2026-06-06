@@ -129,8 +129,13 @@ fun QuizScreen(
                             isWarning -> Amber600
                             else -> Gray700
                         },
-                        modifier = Modifier.padding(end = 8.dp)
+                        modifier = Modifier.padding(end = 4.dp)
                     )
+                }
+                if (isExam) {
+                    TextButton(onClick = { viewModel.finishQuiz() }) {
+                        Text("交卷", color = Amber600, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    }
                 }
                 TextButton(onClick = { showGrid = !showGrid }) {
                     Text(if (showGrid) "收起" else "题号", fontSize = 12.sp)
@@ -261,9 +266,7 @@ fun QuizScreen(
             isSingle = question!!.type == QuestionType.SINGLE || question!!.type == QuestionType.BOOLEAN,
             canSubmit = selected.isNotEmpty(),
             onPrev = { viewModel.goPrev() },
-            onNext = { viewModel.goNext() },
-            onSubmit = { viewModel.submitAnswer() },
-            onFinish = { viewModel.finishQuiz() }
+            onNext = { viewModel.goNext() }
         )
     }
 }
@@ -328,9 +331,7 @@ private fun QuizBottomBar(
     isSingle: Boolean,
     canSubmit: Boolean,
     onPrev: () -> Unit,
-    onNext: () -> Unit,
-    onSubmit: () -> Unit,
-    onFinish: () -> Unit
+    onNext: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -355,11 +356,10 @@ private fun QuizBottomBar(
 
             // Center action button
             if (isExam) {
-                TextButton(onClick = onFinish) {
-                    Text("交卷", color = Amber600, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                }
+                // 交卷按钮已移至右上角
+                Spacer(Modifier.width(1.dp))
             } else if (isAnswered) {
-                // Already answered: show continue/next
+                // Already answered: show next/continue
                 Button(
                     onClick = onNext,
                     shape = RoundedCornerShape(10.dp),
@@ -370,25 +370,16 @@ private fun QuizBottomBar(
                     Text(if (progress.current >= progress.total) "完成" else "下一题 →", fontSize = 13.sp)
                 }
             } else {
-                // Not answered
-                if (isSingle) {
-                    Button(
-                        onClick = onNext,
-                        enabled = canSubmit,
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Blue600)
-                    ) {
-                        Text(if (progress.current >= progress.total) "完成" else "下一题 →", fontSize = 13.sp)
-                    }
-                } else {
-                    Button(
-                        onClick = onSubmit,
-                        enabled = canSubmit,
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Purple600)
-                    ) {
-                        Text("提交答案", fontSize = 13.sp)
-                    }
+                // Not answered: click to submit and advance
+                Button(
+                    onClick = onNext,
+                    enabled = canSubmit,
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isSingle) Blue600 else Purple600
+                    )
+                ) {
+                    Text(if (progress.current >= progress.total) "完成" else "下一题 →", fontSize = 13.sp)
                 }
             }
 
@@ -426,7 +417,8 @@ fun ResultContent(
             Text("考试完成！", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Gray800)
             Spacer(Modifier.height(16.dp))
 
-            // Score circle for exam (point-based)
+            // Score display
+            val isPass = result.correctRate >= 60
             ScoreCircle(
                 score = result.score,
                 maxScore = result.maxScore ?: 100.0
@@ -435,7 +427,6 @@ fun ResultContent(
             Spacer(Modifier.height(12.dp))
 
             // Correct rate text
-            val isPass = result.correctRate >= 60
             Text(
                 "正确率 ${result.correctRate.toInt()}%",
                 fontSize = 16.sp,
@@ -460,7 +451,7 @@ fun ResultContent(
             Text("练习完成！", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Gray800)
             Spacer(Modifier.height(16.dp))
 
-            // Score circle for practice (point-based)
+            // Score display (correct count out of total)
             ScoreCircle(
                 score = result.score,
                 maxScore = result.maxScore ?: result.totalCount.toDouble()

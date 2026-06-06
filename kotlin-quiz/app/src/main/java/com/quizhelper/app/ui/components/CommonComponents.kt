@@ -148,7 +148,7 @@ fun ScoreCircle(
     val percentage = if (maxScore != null && maxScore > 0) (score / maxScore * 100) else score
     val isPass = percentage >= 60
     val displayText = if (maxScore != null && maxScore > 0) {
-        "${score.toInt()} / ${maxScore.toInt()}"
+        "${score.toInt()}分"
     } else {
         "${score.toInt()}%"
     }
