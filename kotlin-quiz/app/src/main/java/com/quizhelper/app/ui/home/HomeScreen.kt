@@ -78,7 +78,7 @@ fun HomeScreen(
             Text("📚", fontSize = 48.sp)
             Spacer(Modifier.height(16.dp))
             Text(
-                "刷题助手",
+                "墨答",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = Gray800
@@ -119,7 +119,7 @@ fun HomeScreen(
                 colors = CardDefaults.cardColors(containerColor = Blue50.copy(alpha = 0.5f))
             ) {
                 Text(
-                    "💡 考试或练习完成后，连续点击 🏆/🎉 图标有惊喜哦！",
+                    "🎲 考试或练习完成后，随机出现彩蛋（约8%概率）",
                     modifier = Modifier.padding(14.dp),
                     fontSize = 12.sp,
                     color = Blue600,
@@ -129,7 +129,7 @@ fun HomeScreen(
         } else {
             // Has question bank
             Text(
-                "刷题助手",
+                "墨答",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = Gray800

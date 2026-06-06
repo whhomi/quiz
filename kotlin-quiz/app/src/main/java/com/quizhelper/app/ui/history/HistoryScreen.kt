@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.quizhelper.app.data.model.HistoryRecord
+import com.quizhelper.app.ui.components.*
 import com.quizhelper.app.ui.theme.*
 import com.quizhelper.app.util.TimeUtils
 
@@ -25,16 +26,28 @@ fun HistoryScreen(
     viewModel: HistoryViewModel = viewModel()
 ) {
     val historyList by viewModel.historyList.collectAsState()
+    var showClearDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 24.dp)
     ) {
-        Text(
-            "📊 历史记录",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            color = Gray800
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                "📊 历史记录",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                color = Gray800
+            )
+            if (historyList.isNotEmpty()) {
+                TextButton(onClick = { showClearDialog = true }) {
+                    Text("🗑 清空", color = Red500, fontSize = 13.sp)
+                }
+            }
+        }
         Spacer(Modifier.height(16.dp))
 
         if (historyList.isEmpty()) {
@@ -58,6 +71,19 @@ fun HistoryScreen(
                 }
             }
         }
+    }
+
+    if (showClearDialog) {
+        ConfirmDialog(
+            title = "清空历史记录",
+            message = "确定要清空所有练习记录吗？此操作不可恢复。",
+            confirmText = "确认清空",
+            onConfirm = {
+                showClearDialog = false
+                viewModel.clearHistory()
+            },
+            onDismiss = { showClearDialog = false }
+        )
     }
 }
 

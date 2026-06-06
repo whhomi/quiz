@@ -15,6 +15,10 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
 
     val historyList: StateFlow<List<HistoryRecord>> = repository.allHistory
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun clearHistory() {
+        viewModelScope.launch { repository.clearHistory() }
+    }
 }
 
 class HistoryDetailViewModel(application: Application) : AndroidViewModel(application) {

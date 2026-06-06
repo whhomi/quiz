@@ -9,7 +9,7 @@
         android:name=".QuizHelperApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="刷题助手"
+        android:label="墨答"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.QuizHelper">

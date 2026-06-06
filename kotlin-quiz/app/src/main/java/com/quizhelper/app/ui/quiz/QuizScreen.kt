@@ -427,7 +427,7 @@ private fun QuizBottomBar(
                 Spacer(Modifier.width(1.dp))
             } else if (isExam && isMulti && !isAnswered) {
                 Button(
-                    onClick = onNext,
+                    onClick = onSubmit,
                     enabled = canSubmit,
                     modifier = Modifier.height(40.dp),
                     shape = RoundedCornerShape(10.dp),
