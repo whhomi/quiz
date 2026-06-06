@@ -142,18 +142,6 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
 
     fun goNext() {
         val s = _session ?: return
-        // 练习模式下，如果当前 MULTIPLE 题已选但未提交，自动提交
-        if (s.mode == QuizMode.PRACTICE) {
-            val q = QuizEngine.getCurrentQuestion(s)
-            if (q != null && q.type == QuestionType.MULTIPLE && !s.answers.containsKey(q.id)) {
-                val selected = _selectedAnswers.value
-                if (selected.isNotEmpty()) {
-                    val result = QuizEngine.submitAnswer(s, selected)
-                    _judgment.value = result
-                    recordWrongQuestion(result.questionId, result.isCorrect)
-                }
-            }
-        }
         val hasMore = QuizEngine.nextQuestion(s)
         if (!hasMore) {
             finishQuiz()

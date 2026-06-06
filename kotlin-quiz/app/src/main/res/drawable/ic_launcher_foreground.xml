@@ -4,12 +4,54 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- 大大的白色问号 -->
+    <!-- 左页 -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M48,28C39.72,28 33,34.72 33,43C33,44.66 34.34,46 36,46C37.66,46 39,44.66 39,43C39,38.03 43.03,34 48,34C52.97,34 57,38.03 57,43C57,47.97 52.97,52 48,52C46.34,52 45,53.34 45,55L45,62C45,63.66 46.34,65 48,65C49.66,65 51,63.66 51,62L51,57.31C57.19,55.57 62,49.87 62,43C62,34.72 56.28,28 48,28Z"/>
-    <!-- 问号下面那个点 -->
+        android:pathData="M54,28 Q32,28 20,36 L20,74 Q32,66 54,66 Z" />
+    <!-- 右页 -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M48,68C46.34,68 45,69.34 45,71C45,72.66 46.34,74 48,74C49.66,74 51,72.66 51,71C51,69.34 49.66,68 48,68Z"/>
+        android:pathData="M54,28 Q76,28 88,36 L88,74 Q76,66 54,66 Z" />
+    <!-- 书脊阴影 -->
+    <path
+        android:fillColor="#E0E7FF"
+        android:pathData="M53,28 L53,66 L55,66 L55,28 Z" />
+    <!-- 左页文字线 -->
+    <path
+        android:pathData="M24,42 Q38,38 50,40"
+        android:strokeWidth="1.2"
+        android:strokeColor="#C7D2FE"
+        android:fillColor="@android:color/transparent"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M24,50 Q38,46 50,48"
+        android:strokeWidth="1.2"
+        android:strokeColor="#C7D2FE"
+        android:fillColor="@android:color/transparent"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M24,58 Q38,54 50,56"
+        android:strokeWidth="1.2"
+        android:strokeColor="#C7D2FE"
+        android:fillColor="@android:color/transparent"
+        android:strokeLineCap="round" />
+    <!-- 右页文字线 -->
+    <path
+        android:pathData="M84,42 Q70,38 58,40"
+        android:strokeWidth="1.2"
+        android:strokeColor="#C7D2FE"
+        android:fillColor="@android:color/transparent"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M84,50 Q70,46 58,48"
+        android:strokeWidth="1.2"
+        android:strokeColor="#C7D2FE"
+        android:fillColor="@android:color/transparent"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M84,58 Q70,54 58,56"
+        android:strokeWidth="1.2"
+        android:strokeColor="#C7D2FE"
+        android:fillColor="@android:color/transparent"
+        android:strokeLineCap="round" />
 </vector>

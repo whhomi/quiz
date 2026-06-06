@@ -264,9 +264,11 @@ fun QuizScreen(
             progress = progress,
             isAnswered = isAnswered,
             isSingle = question!!.type == QuestionType.SINGLE || question!!.type == QuestionType.BOOLEAN,
+            isMulti = question!!.type == QuestionType.MULTIPLE,
             canSubmit = selected.isNotEmpty(),
             onPrev = { viewModel.goPrev() },
-            onNext = { viewModel.goNext() }
+            onNext = { viewModel.goNext() },
+            onSubmit = { viewModel.submitAnswer() }
         )
     }
 }
@@ -329,9 +331,11 @@ private fun QuizBottomBar(
     progress: com.quizhelper.app.util.ProgressInfo,
     isAnswered: Boolean,
     isSingle: Boolean,
+    isMulti: Boolean,
     canSubmit: Boolean,
     onPrev: () -> Unit,
-    onNext: () -> Unit
+    onNext: () -> Unit,
+    onSubmit: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -358,6 +362,16 @@ private fun QuizBottomBar(
             if (isExam) {
                 // 交卷按钮已移至右上角
                 Spacer(Modifier.width(1.dp))
+            } else if (isMulti && !isAnswered) {
+                // 多选题未答 → 显示"提交答案"按钮
+                Button(
+                    onClick = onSubmit,
+                    enabled = canSubmit,
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Purple600)
+                ) {
+                    Text("提交答案", fontSize = 13.sp)
+                }
             } else if (isAnswered) {
                 // Already answered: show next/continue
                 Button(
@@ -370,14 +384,12 @@ private fun QuizBottomBar(
                     Text(if (progress.current >= progress.total) "完成" else "下一题 →", fontSize = 13.sp)
                 }
             } else {
-                // Not answered: click to submit and advance
+                // Not answered (SINGLE/BOOLEAN): click to auto-submit and advance
                 Button(
                     onClick = onNext,
                     enabled = canSubmit,
                     shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isSingle) Blue600 else Purple600
-                    )
+                    colors = ButtonDefaults.buttonColors(containerColor = Blue600)
                 ) {
                     Text(if (progress.current >= progress.total) "完成" else "下一题 →", fontSize = 13.sp)
                 }
@@ -386,7 +398,7 @@ private fun QuizBottomBar(
             // Next button (right)
             OutlinedButton(
                 onClick = onNext,
-                enabled = progress.current < progress.total && !(isExam && !isAnswered),
+                enabled = progress.current < progress.total && !(isExam && !isAnswered) && !(isMulti && !isAnswered),
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Text("下一题 →", fontSize = 13.sp)
