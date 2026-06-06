@@ -40,6 +40,15 @@ const state = reactive({
   lastJudgment: null
 })
 
+// Android 环境异步初始化 SQLite 题库
+storage.initAndroidStorage().then(() => {
+  const bank = storage.getQuestionBank()
+  if (bank) {
+    state.questionBank = markRaw(bank)
+    log.info('Android SQLite 题库已加载', { total: bank.total })
+  }
+})
+
 // ---- 题库相关 ----
 const hasBank = computed(() => state.questionBank !== null && state.questionBank.questions?.length > 0)
 const totalCount = computed(() => state.questionBank?.total || 0)

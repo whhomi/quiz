@@ -1,14 +1,51 @@
 /**
- * storage.js — localStorage 封装层
+ * storage.js — 存储封装层
  * 管理 questionBank 和 historyList 的读写
+ * Android 环境下题库使用 SQLite，历史记录仍用 localStorage
  */
 
 import { createLogger } from './logger'
+import {
+  isCapacitorNative,
+  dbGetQuestionBank,
+  dbSetQuestionBank,
+  dbHasQuestionBank,
+  dbClearAll,
+  migrateFromLocalStorage
+} from './database'
 
 const log = createLogger('storage')
 const KEY_BANK = 'questionBank'
 const KEY_HISTORY = 'historyList'
 const MAX_STORAGE = 5 * 1024 * 1024 // 5MB localStorage limit
+
+// ---- Android 缓存 ----
+/** @type {object|null} Android 环境下的题库内存缓存 */
+let _androidBank = null
+/** @type {boolean} Android 环境是否已初始化 */
+let _androidReady = false
+
+/**
+ * 初始化 Android 存储（从 SQLite 加载题库到缓存）
+ * 在模块加载时由 store 调用
+ */
+async function initAndroidStorage() {
+  if (!isCapacitorNative()) return
+  if (_androidReady) return
+  _androidReady = true
+
+  // 首次启动尝试从 localStorage 迁移到 SQLite
+  const migrated = await migrateFromLocalStorage()
+  if (migrated) {
+    _androidBank = await dbGetQuestionBank()
+    log.info('Android 存储初始化完成（已迁移）', { hasBank: !!_androidBank })
+    return
+  }
+
+  // 直接从 SQLite 加载
+  _androidBank = await dbGetQuestionBank()
+  log.info('Android 存储初始化完成', { hasBank: !!_androidBank })
+}
 
 /**
  * 估算已用存储空间（字节）
@@ -28,6 +65,12 @@ function getStorageUsage() {
  * @returns {object|null} 题库对象，无数据时返回 null
  */
 function getQuestionBank() {
+  // Android 路径：返回内存缓存
+  if (isCapacitorNative()) {
+    return _androidBank
+  }
+
+  // localStorage 路径
   try {
     const raw = localStorage.getItem(KEY_BANK)
     const bank = raw ? JSON.parse(raw) : null
@@ -44,6 +87,16 @@ function getQuestionBank() {
  * @param {object} bank - 题库对象
  */
 function setQuestionBank(bank) {
+  // Android 路径：写入内存缓存 + 异步写入 SQLite
+  if (isCapacitorNative()) {
+    const json = JSON.stringify(bank)
+    _androidBank = bank
+    dbSetQuestionBank(bank).catch(e => log.error('SQLite 写入失败', e.message))
+    log.info('题库已写入 SQLite', { total: bank.total, size: json.length })
+    return
+  }
+
+  // localStorage 路径
   const json = JSON.stringify(bank)
   if (json.length * 2 > MAX_STORAGE * 0.9) {
     log.error('题库过大', { size: json.length, questions: bank.total })
@@ -58,6 +111,11 @@ function setQuestionBank(bank) {
  * @returns {boolean}
  */
 function hasQuestionBank() {
+  // Android 路径
+  if (isCapacitorNative()) {
+    return _androidBank !== null
+  }
+
   const exists = localStorage.getItem(KEY_BANK) !== null
   log.debug('检查题库', { exists })
   return exists
@@ -112,6 +170,15 @@ function clearHistory() {
  * 清空全部数据（题库 + 历史）
  */
 function clearAll() {
+  // Android 路径
+  if (isCapacitorNative()) {
+    _androidBank = null
+    dbClearAll().catch(e => log.error('SQLite 清空失败', e.message))
+    localStorage.removeItem(KEY_HISTORY)
+    log.info('全部数据已清空（SQLite + localStorage）')
+    return
+  }
+
   localStorage.removeItem(KEY_BANK)
   localStorage.removeItem(KEY_HISTORY)
   log.info('全部数据已清空')
@@ -129,6 +196,7 @@ function replaceBank(bank) {
 
 export {
   getStorageUsage,
+  initAndroidStorage,
   getQuestionBank,
   setQuestionBank,
   hasQuestionBank,
