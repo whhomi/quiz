@@ -42,6 +42,7 @@
 | **UI 框架** | Jetpack Compose (Material 3) |
 | **数据库** | Room (SQLite, 5 张表) |
 | **架构模式** | MVVM (Model-View-ViewModel) |
+| **鼓励语系统** | 内置 100 句 + 彩蛋彩蛋 |
 
 ### 与其他模块的关系
 
@@ -148,6 +149,7 @@ kotlin-quiz/
             │       └── Theme.kt         # Material 3 主题配置
             │
             └── util/
+                ├── Encouragement.kt     # 鼓励语系统（100 句 + 彩蛋）
                 ├── Logger.kt            # 日志工具（封装 Android Log）
                 ├── QuizEngine.kt        # 题冧引擎（核心业务逻辑）
                 └── TimeUtils.kt         # 时间格式化工具
@@ -177,12 +179,13 @@ kotlin-quiz/
 | 随机练习 | 全部题目随机打乱顺序练习 |
 | 即时反馈 | 提交答案后立即显示对错和正确答案 |
 | 自动提交 | 单/判断题选择后直接判对错 |
+| 提交答案 | 多选题需手动点击「提交答案」后判对错 |
 | 解析查看 | 每道题可查看解析说明 |
 | 答题网格 | 题号网格，已答绿色/未答灰色/当前蓝色高亮 |
-| 跳题 | 通过网格点击任意跳转 |
+| 跳题 | 通过网格点击任意跳转（未答多选题不可跳） |
 | 自由导航 | 上一题/下一题，可反复修改已答题 |
 | 进度条 | 顶部进度条显示答题进度 |
-| **得分展示** | 分开显示**得分**（正确题数/总题数）和**正确率**（百分比） |
+| **得分展示** | 分开显示**得分**（正确题数）和**正确率**（百分比） |
 
 ### 4.3 考试模式 (Exam)
 
@@ -325,6 +328,10 @@ MainScreen (Scaffold + 底部导航)
 | `ScoreCircle` | 圆形分数展示（60分以上绿色） |
 | `ScoreStat` | 统计数字组件 |
 | `ConfirmDialog` | 通用确认弹窗 |
+| `PrimaryButton` | 主操作按钮（蓝底白字，48dp高，圆角12dp） |
+| `SmallButton` | 次要操作按钮（40dp高，圆角10dp） |
+| `SecondaryButton` | 轮廓按钮（灰边框，48dp高，圆角12dp） |
+| `BackButton` | 返回按钮（灰色文字，无背景） |
 
 ### 5.4 工具层
 
@@ -346,6 +353,22 @@ MainScreen (Scaffold + 底部导航)
 | `selectExamQuestions()` | 按配额抽题（单60/多100/判40） |
 | `computeExamScore()` | 考试模式计分（每题0.5分） |
 | `buildExamResult()` | 构建考试结果 |
+
+#### Encouragement — 鼓励语系统
+
+```kotlin
+object Encouragement
+```
+
+100 句内置鼓励语，分 6 类（学霸、轻松、燃系、禅意、考试、通用），每次练习/考试完成后随机展示一条。
+
+| 方法 | 说明 |
+|------|------|
+| `random()` | 随机返回一条鼓励语 |
+| `checkEasterEgg()` | 彩蛋检测（连续调用 7 次返回 true） |
+| `EASTER_EGG_MESSAGE` | 彩蛋内容："嘻嘻，你打出彩蛋了，你会考过的！ 🎉" |
+
+彩蛋触发方式：在结果页连续点击 🏆/🎉 图标 7 次。
 
 #### Logger — 日志封装
 
@@ -402,20 +425,20 @@ Logger.create("QuizVM") -> Log tag: "QuizHelper/QuizVM"
 ### 6.2 练习模式流程
 
 ```
-首页 → 点击"开始练习"
-    → navController.navigate("quiz/practice")
+首页 → 点击"顺序练习"或"随机练习"
+    → navController.navigate("quiz/practice?practiceType=sequential&source=all")
     → QuizScreen 加载
-    → QuizViewModel.startPractice()
+    → QuizViewModel.startPractice(random= 是否随机, source="all")
         → repository.getAllQuestionsList()
-        → QuizEngine.createSession(questions, random=true, mode=PRACTICE)
+        → QuizEngine.createSession(questions, random=是否随机, mode=PRACTICE)
     → 逐题展示
-        → 单选题/判断题: 点击选项 → 自动判对错 → 显示反馈
-        → 多选题: 点击选项(可多选) → 点击"提交答案" → 显示反馈
-    → 用户可: 上一题 / 下一题 / 题号网格跳转
-    → 点击"完成" / 最后一题"下一题"
+        → 单选题/判断题: 点击选项 → 自动提交 → 显示对错 + 解析 → 可自由翻页
+        → 多选题: 点击勾选选项 → 点击「提交答案」 → 显示对错 + 解析 → 可自由翻页
+    → 用户可: 上一题 / 下一题(自动提交) / 题号网格跳转
+    → 点击"完成"
         → QuizEngine.buildResult()
         → repository.saveResult()
-    → 显示 ResultContent 结果页
+    → 显示 ResultContent 结果页（含随机鼓励语 + 分数 + 正确率 + 操作按钮）
 ```
 
 ### 6.3 考试模式流程
@@ -464,13 +487,14 @@ Logger.create("QuizVM") -> Log tag: "QuizHelper/QuizVM"
 
 ```kotlin
 sealed class Screen(val route: String) {
-    data object Home          : Screen("home")
-    data object Quiz          : Screen("quiz/{mode}?practiceType={practiceType}&source={source}")
-    data object Result        : Screen("result/{sessionId}")
-    data object History       : Screen("history")
-    data object HistoryDetail : Screen("history/{id}")
-    data object WrongQuestions : Screen("wrong_questions")
-    data object Settings      : Screen("settings")
+    data object Home              : Screen("home")
+    data object Quiz              : Screen("quiz/{mode}?practiceType={practiceType}&source={source}")
+    data object Result            : Screen("result/{sessionId}")
+    data object History           : Screen("history")
+    data object HistoryDetail     : Screen("history/{id}")
+    data object WrongQuestions    : Screen("wrong_questions")
+    data object WrongQuestionDetail : Screen("wrong_detail/{questionId}")
+    data object Settings          : Screen("settings")
 }
 ```
 
@@ -494,6 +518,7 @@ home (startDestination)
 ├── history
 │   └── history/{id}
 ├── wrong_questions            → 错题集
+│   └── wrong_detail/{questionId} → 错题详情（正确选项高亮 + 解析）
 └── settings
 ```
 
@@ -651,8 +676,9 @@ val showBottomBar = currentRoute in listOf(
 - 每题 0.5 分（使满分接近传统 100 分制）
 - 选即提交：点击选项立即记录答案并评判
 - 不可修改：模拟真实考试环境
+- **交卷按钮**位于右上角 TopAppBar，底部栏不再显示
 
-### 9.5 错题集机制
+### 9.6 错题集机制
 
 - 采用独立表 (`wrong_questions`) + 外键引用题目表
 - 答错自动加入（未存在则插入，已存在则递增 `wrongCount`）
@@ -660,7 +686,7 @@ val showBottomBar = currentRoute in listOf(
 - 正常练习中答对不移出，保留错题记录直至用户主动移除
 - CASCADE 外键保证题库重新导入时错题集自动清理
 
-### 9.6 分数分离展示
+### 9.7 分数分离展示
 
 `QuizResult` 增加 `correctRate` 字段，与 `score` 分开：
 
@@ -668,11 +694,44 @@ val showBottomBar = currentRoute in listOf(
 |------|----------|----------|
 | `score` | 正确题数（每题1分） | 正确题数 × 0.5 |
 | `maxScore` | 总题数 | 总题数 × 0.5 |
-| `correctRate` | 正确数/已答数 × 100% | 正确数/总题数 × 100% |
+| `correctRate` | 正确数/总题数 × 100% | 正确数/总题数 × 100% |
 
-UI 中同时展示"得分 X/Y"和"正确率 X%"，不再混用。
+UI 中同时展示"得分 X 分"和"正确率 X%"，不再混用。
 
-### 9.7 颜色系统
+### 9.8 按钮 UI 统一
+
+设计 4 个统一按钮组件，确保全应用按钮风格一致：
+
+| 组件 | 高度 | 圆角 | 典型用途 |
+|------|------|------|----------|
+| `PrimaryButton` | 48dp | 12dp | 导入题库、查看详情 |
+| `SmallButton` | 40dp | 10dp | 顺序练习、随机练习、开始考试 |
+| `SecondaryButton` | 48dp | 12dp | 历史记录、再练一次 |
+| `BackButton` | — | — | 返回 |
+
+所有按钮统一：`shape = RoundedCornerShape(12dp/10dp)`、禁用态为灰色 (`Gray200`)、正文大小 13-15sp。
+
+### 9.9 鼓励语系统 + 彩蛋
+
+- 内置 100 句分类鼓励语（6 类：学霸/轻松/燃系/禅意/考试/通用）
+- 每次练习/考试完成后从结果页随机展示一条
+- **彩蛋机制**：连续点击结果页 🏆/🎉 图标 7 次 → 触发特殊鼓励语：
+  > "嘻嘻，你打出彩蛋了，你会考过的！ 🎉"
+- 触发后鼓励卡片变为琥珀色背景高亮
+
+### 9.10 多选题交互逻辑
+
+练习模式中多选题与其他题型采用不同交互：
+
+| 题型 | 操作 | 翻页 |
+|------|------|------|
+| 单选题 | 点击选项 → 自动提交 → 显示反馈 | 可自由翻页 |
+| 判断题 | 点击选项 → 自动提交 → 显示反馈 | 可自由翻页 |
+| 多选题 | 勾选选项 → 点击「提交答案」→ 显示反馈 | 未提交不可翻页，禁止跳过 |
+
+右侧「下一题」按钮在考试未答或多选题（练习）未提交时禁用，防止跳过。考试全部为选即提交，无「提交答案」按钮。
+
+### 9.11 颜色系统
 
 自定义 6 色系（蓝/绿/红/紫/琥珀/灰），每色系 4-8 个色阶，确保：
 - 红绿色盲友好（辅以图标 ✓✗）
