@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 大大的白色问号 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M48,28C39.72,28 33,34.72 33,43C33,44.66 34.34,46 36,46C37.66,46 39,44.66 39,43C39,38.03 43.03,34 48,34C52.97,34 57,38.03 57,43C57,47.97 52.97,52 48,52C46.34,52 45,53.34 45,55L45,62C45,63.66 46.34,65 48,65C49.66,65 51,63.66 51,62L51,57.31C57.19,55.57 62,49.87 62,43C62,34.72 56.28,28 48,28Z"/>
+    <!-- 问号下面那个点 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M48,68C46.34,68 45,69.34 45,71C45,72.66 46.34,74 48,74C49.66,74 51,72.66 51,71C51,69.34 49.66,68 48,68Z"/>
+</vector>
