@@ -35,6 +35,7 @@ fun QuizScreen(
     mode: String = "practice",
     practiceType: String = "random",
     source: String = "all",
+    examType: String = "full_random",
     viewModel: QuizViewModel = viewModel()
 ) {
     val question by viewModel.currentQuestion.collectAsState()
@@ -54,7 +55,7 @@ fun QuizScreen(
     LaunchedEffect(Unit) {
         if (!started) {
             started = true
-            if (mode == "exam") viewModel.startExam()
+            if (mode == "exam") viewModel.startExam(examType)
             else viewModel.startPractice(random = practiceType == "random", source = source)
         }
     }
@@ -71,23 +72,36 @@ fun QuizScreen(
     }
 
     if (isFinished && result != null) {
-        EncouragementDialog(
-            result = result!!,
-            onViewDetail = {
-                navController.navigate(Screen.HistoryDetail.createRoute(result!!.sessionId)) {
-                    popUpTo(Screen.Home.route) { inclusive = true }
-                }
-            },
-            onRetry = {
-                if (result!!.mode == QuizMode.EXAM) viewModel.startExam()
-                else viewModel.startPractice(random = practiceType == "random", source = source)
-            },
-            onHome = {
-                navController.navigate(Screen.Home.route) {
+        var showResultDialog by remember { mutableStateOf(true) }
+        var navigateTo by remember { mutableStateOf<String?>(null) }
+
+        LaunchedEffect(navigateTo) {
+            navigateTo?.let { route ->
+                navController.navigate(route) {
                     popUpTo(Screen.Home.route) { inclusive = true }
                 }
             }
-        )
+        }
+
+        if (showResultDialog) {
+            EncouragementDialog(
+                result = result!!,
+                onViewDetail = {
+                    showResultDialog = false
+                    navigateTo = Screen.HistoryDetail.createRoute(result!!.sessionId)
+                },
+                onRetry = {
+                    showResultDialog = false
+                    if (result!!.mode == QuizMode.EXAM) viewModel.startExam(examType)
+                    else viewModel.startPractice(random = practiceType == "random", source = source)
+                },
+                onHome = {
+                    showResultDialog = false
+                    showExitConfirm = false
+                    navigateTo = Screen.Home.route
+                }
+            )
+        }
         return
     }
 
@@ -397,8 +411,18 @@ private fun QuizBottomBar(
             }
 
             // Center action button
-            if (isExam) {
+            if (isExam && !isMulti) {
                 Spacer(Modifier.width(1.dp))
+            } else if (isExam && isMulti && !isAnswered) {
+                Button(
+                    onClick = onNext,
+                    enabled = canSubmit,
+                    modifier = Modifier.height(40.dp),
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Purple600)
+                ) {
+                    Text("提交答案", fontSize = 13.sp)
+                }
             } else if (isMulti && !isAnswered) {
                 Button(
                     onClick = onSubmit,
@@ -435,7 +459,7 @@ private fun QuizBottomBar(
             // Next button (right)
             OutlinedButton(
                 onClick = onNext,
-                enabled = progress.current < progress.total && !(isExam && !isAnswered) && !(isMulti && !isAnswered),
+                enabled = progress.current < progress.total && !(isExam && !isAnswered) && !(isMulti && !isAnswered) && !(isExam && isMulti && !isAnswered),
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Text("下一题 →", fontSize = 13.sp)

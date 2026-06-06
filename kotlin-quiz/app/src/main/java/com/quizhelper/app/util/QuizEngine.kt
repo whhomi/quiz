@@ -85,16 +85,26 @@ object QuizEngine {
         )
     }
 
-    fun selectExamQuestions(questions: List<Question>): List<Question> {
-        val quota = mapOf(QuestionType.SINGLE to 60, QuestionType.MULTIPLE to 100, QuestionType.BOOLEAN to 40)
+    fun selectExamQuestions(questions: List<Question>, examType: String = "full_random"): List<Question> {
         val selected = mutableListOf<Question>()
         var counter = 1
-        for ((type, count) in quota) {
+
+        fun pickAndTag(type: QuestionType, count: Int) {
             val pool = shuffle(questions.filter { it.type == type })
-            val taken = pool.take(minOf(count, pool.size))
-            taken.forEach { q ->
+            pool.take(minOf(count, pool.size)).forEach { q ->
                 selected.add(q.copy(questionId = "eq${counter++}"))
             }
+        }
+
+        if (examType == "grouped") {
+            pickAndTag(QuestionType.SINGLE, 60)
+            pickAndTag(QuestionType.MULTIPLE, 100)
+            pickAndTag(QuestionType.BOOLEAN, 40)
+        } else {
+            pickAndTag(QuestionType.SINGLE, 60)
+            pickAndTag(QuestionType.MULTIPLE, 100)
+            pickAndTag(QuestionType.BOOLEAN, 40)
+            return shuffle(selected)
         }
         return selected
     }

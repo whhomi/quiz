@@ -448,10 +448,10 @@ fun EncouragementDialog(
                     onClick = onHome,
                     modifier = Modifier.fillMaxWidth().height(48.dp),
                     shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, Gray200),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Gray400)
+                    border = BorderStroke(1.5.dp, Gray300),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Gray600)
                 ) {
-                    Text("返回首页", fontSize = 14.sp)
+                    Text("返回首页", fontSize = 14.sp, fontWeight = FontWeight.Medium)
                 }
             }
         }

@@ -67,14 +67,14 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun startExam() {
+    fun startExam(examType: String = "full_random") {
         _isFinished.value = false
         _result.value = null
         _isReady.value = false
         viewModelScope.launch {
             val allQuestions = repository.getAllQuestionsList()
             if (allQuestions.isEmpty()) { _isReady.value = true; return@launch }
-            val examQuestions = QuizEngine.selectExamQuestions(allQuestions)
+            val examQuestions = QuizEngine.selectExamQuestions(allQuestions, examType)
             _session = QuizEngine.createSession(examQuestions, random = false, mode = QuizMode.EXAM, timeLimit = 6000)
             refreshFromSession()
             _isReady.value = true
@@ -124,18 +124,6 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
             // 多选题：先记录选中状态，等待点击"提交答案"
             if (index in current) current.remove(index) else current.add(index)
             _selectedAnswers.value = current
-            if (_session?.mode == QuizMode.EXAM) {
-                val s = _session ?: return
-                QuizEngine.submitAnswer(s, current)
-                val isCorrect = QuizEngine.judge(current, q.getAnswerList())
-                _judgment.value = Judgment(
-                    isCorrect = isCorrect,
-                    correctAnswer = q.getAnswerList(),
-                    questionId = q.id
-                )
-                refreshFromSession()
-                recordWrongQuestion(q.id, isCorrect)
-            }
         }
     }
 

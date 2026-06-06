@@ -23,25 +23,37 @@ fun ResultScreen(
     val result by viewModel.result.collectAsState()
 
     if (result != null) {
-        EncouragementDialog(
-            result = result!!,
-            onViewDetail = {
-                navController.navigate("history/$sessionId") {
-                    popUpTo("home") { inclusive = true }
-                }
-            },
-            onRetry = {
-                if (result!!.mode == com.quizhelper.app.data.model.QuizMode.EXAM)
-                    viewModel.startExam()
-                else
-                    viewModel.startPractice()
-            },
-            onHome = {
-                navController.navigate("home") {
+        var showResultDialog by remember { mutableStateOf(true) }
+        var navigateTo by remember { mutableStateOf<String?>(null) }
+
+        LaunchedEffect(navigateTo) {
+            navigateTo?.let { route ->
+                navController.navigate(route) {
                     popUpTo("home") { inclusive = true }
                 }
             }
-        )
+        }
+
+        if (showResultDialog) {
+            EncouragementDialog(
+                result = result!!,
+                onViewDetail = {
+                    showResultDialog = false
+                    navigateTo = "history/$sessionId"
+                },
+                onRetry = {
+                    showResultDialog = false
+                    if (result!!.mode == com.quizhelper.app.data.model.QuizMode.EXAM)
+                        viewModel.startExam()
+                    else
+                        viewModel.startPractice()
+                },
+                onHome = {
+                    showResultDialog = false
+                    navigateTo = "home"
+                }
+            )
+        }
     } else {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("加载中...")

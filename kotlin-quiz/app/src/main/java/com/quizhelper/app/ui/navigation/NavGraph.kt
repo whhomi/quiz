@@ -27,13 +27,15 @@ fun NavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
             arguments = listOf(
                 navArgument("mode") { type = NavType.StringType; defaultValue = "practice" },
                 navArgument("practiceType") { type = NavType.StringType; defaultValue = "random" },
-                navArgument("source") { type = NavType.StringType; defaultValue = "all" }
+                navArgument("source") { type = NavType.StringType; defaultValue = "all" },
+                navArgument("examType") { type = NavType.StringType; defaultValue = "full_random" }
             )
         ) { backStackEntry ->
             val mode = backStackEntry.arguments?.getString("mode") ?: "practice"
             val practiceType = backStackEntry.arguments?.getString("practiceType") ?: "random"
             val source = backStackEntry.arguments?.getString("source") ?: "all"
-            QuizScreen(navController = navController, mode = mode, practiceType = practiceType, source = source)
+            val examType = backStackEntry.arguments?.getString("examType") ?: "full_random"
+            QuizScreen(navController = navController, mode = mode, practiceType = practiceType, source = source, examType = examType)
         }
         composable(
             route = Screen.Result.route,

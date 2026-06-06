@@ -302,9 +302,11 @@ fun HistoryDetailScreen(
         SecondaryButton(
             text = "返回历史列表",
             onClick = { navController.popBackStack() },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-            textColor = Blue600
+            modifier = Modifier.fillMaxWidth(),
+            textColor = Blue600,
+            fontSize = 15
         )
+        Spacer(Modifier.height(16.dp))
     }
 }
 

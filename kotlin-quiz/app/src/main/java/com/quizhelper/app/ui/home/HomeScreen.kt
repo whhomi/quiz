@@ -199,17 +199,30 @@ fun HomeScreen(
                     Spacer(Modifier.height(8.dp))
                     Text("限时 100 分钟 · 满分 100 分", fontSize = 12.sp, color = Gray400)
                     Spacer(Modifier.height(12.dp))
-                    SmallButton(
-                        text = "🏆 开始考试",
-                        onClick = {
-                            navController.navigate(Screen.Quiz.createRoute("exam")) {
-                                launchSingleTop = true
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        containerColor = Amber600,
-                        fontSize = 15
-                    )
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        SmallButton(
+                            text = "🔀 全随机考试",
+                            onClick = {
+                                navController.navigate(Screen.Quiz.createRoute("exam", examType = "full_random")) {
+                                    launchSingleTop = true
+                                }
+                            },
+                            modifier = Modifier.weight(1f),
+                            containerColor = Amber600,
+                            fontSize = 14
+                        )
+                        SmallButton(
+                            text = "📋 分类考试",
+                            onClick = {
+                                navController.navigate(Screen.Quiz.createRoute("exam", examType = "grouped")) {
+                                    launchSingleTop = true
+                                }
+                            },
+                            modifier = Modifier.weight(1f),
+                            containerColor = Amber600,
+                            fontSize = 14
+                        )
+                    }
                 }
             }
 
