@@ -30,82 +30,60 @@ fun AboutScreen(navController: NavController) {
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        // 顶部渐变区域（二次元风格）
+        // Back bar
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Blue50)
-                .padding(16.dp)
+                .padding(horizontal = 8.dp, vertical = 4.dp)
         ) {
-            BackButton(text = "← 返回", onClick = { navController.popBackStack() })
+            BackButton(onClick = { navController.popBackStack() })
         }
 
-        // 主内容
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 24.dp),
+                .padding(horizontal = 16.dp, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 大图标
-            Text("📖✨", fontSize = 64.sp)
-            Spacer(Modifier.height(8.dp))
-            Text("墨 答", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Gray800)
+            // Header
+            Text("📖", fontSize = 40.sp)
             Spacer(Modifier.height(4.dp))
-            Text("v2.1.0", fontSize = 14.sp, color = Gray400)
-            Spacer(Modifier.height(6.dp))
-            Text("优雅刷题，从容作答", fontSize = 15.sp, color = Gray500)
-            Spacer(Modifier.height(24.dp))
+            Text("墨答 · v2.2.0", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Gray800)
+            Text("优雅刷题，从容作答", fontSize = 13.sp, color = Gray500)
 
-            // 分隔装饰
-            Text("✦ ✦ ✦", fontSize = 14.sp, color = Gray200)
+            Spacer(Modifier.height(16.dp))
 
-            Spacer(Modifier.height(20.dp))
-
-            // 信息列表
-            AboutItem("👤", "作者", "littleboy")
-            Spacer(Modifier.height(4.dp))
-
+            // Info items - compact
             AboutClickableItem("📧", "邮箱", "littleboy@example.com") {
-                val intent = Intent(Intent.ACTION_SENDTO).apply {
+                Intent(Intent.ACTION_SENDTO).apply {
                     data = Uri.parse("mailto:littleboy@example.com")
-                }
-                context.startActivity(intent)
+                }.also { context.startActivity(it) }
             }
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(6.dp))
 
             AboutClickableItem("🐙", "GitHub", "github.com/littleboy") {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/littleboy"))
-                context.startActivity(intent)
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/littleboy")).also { context.startActivity(it) }
             }
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(6.dp))
 
             AboutClickableItem("📦", "项目地址", "github.com/littleboy/quiz-helper") {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/littleboy/quiz-helper"))
-                context.startActivity(intent)
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/littleboy/quiz-helper")).also { context.startActivity(it) }
             }
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(6.dp))
+
+            AboutItem("👤", "作者", "littleboy")
+            Spacer(Modifier.height(6.dp))
 
             AboutItem("📜", "开源协议", "MIT License")
 
-            Spacer(Modifier.height(20.dp))
-            Text("✦ ✦ ✦", fontSize = 14.sp, color = Gray200)
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(16.dp))
 
-            // 版权
-            Text(
-                "© 2026 littleboy",
-                fontSize = 13.sp,
-                color = Gray400
-            )
-            Text(
-                "本软件仅供学习交流使用",
-                fontSize = 12.sp,
-                color = Gray300,
-                modifier = Modifier.padding(top = 4.dp)
-            )
+            // Copyright compact
+            Text("© 2026 littleboy", fontSize = 12.sp, color = Gray300)
+            Text("本软件仅供学习交流使用", fontSize = 11.sp, color = Gray200)
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(16.dp))
         }
     }
 }
@@ -114,18 +92,18 @@ fun AboutScreen(navController: NavController) {
 private fun AboutItem(emoji: String, label: String, value: String) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(10.dp),
         color = Gray50
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(emoji, fontSize = 18.sp)
-            Spacer(Modifier.width(12.dp))
-            Text(label, fontSize = 14.sp, color = Gray500, modifier = Modifier.width(70.dp))
+            Text(emoji, fontSize = 16.sp)
+            Spacer(Modifier.width(10.dp))
+            Text(label, fontSize = 13.sp, color = Gray500, modifier = Modifier.width(60.dp))
             Spacer(Modifier.width(8.dp))
-            Text(value, fontSize = 14.sp, color = Gray700, fontWeight = FontWeight.Medium)
+            Text(value, fontSize = 13.sp, color = Gray700, fontWeight = FontWeight.Medium)
         }
     }
 }
@@ -133,21 +111,19 @@ private fun AboutItem(emoji: String, label: String, value: String) {
 @Composable
 private fun AboutClickableItem(emoji: String, label: String, value: String, onClick: () -> Unit) {
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(14.dp),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        shape = RoundedCornerShape(10.dp),
         color = Blue50
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(emoji, fontSize = 18.sp)
-            Spacer(Modifier.width(12.dp))
-            Text(label, fontSize = 14.sp, color = Gray500, modifier = Modifier.width(70.dp))
+            Text(emoji, fontSize = 16.sp)
+            Spacer(Modifier.width(10.dp))
+            Text(label, fontSize = 13.sp, color = Gray500, modifier = Modifier.width(60.dp))
             Spacer(Modifier.width(8.dp))
-            Text(value, fontSize = 14.sp, color = Blue600, fontWeight = FontWeight.Medium)
+            Text(value, fontSize = 13.sp, color = Blue600, fontWeight = FontWeight.Medium)
         }
     }
 }
