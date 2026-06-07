@@ -100,7 +100,7 @@ fun WrongQuestionsScreen(
                     modifier = Modifier.weight(1f),
                     containerColor = Red500
                 )
-                SecondaryButton(
+                SmallButton(
                     text = "📖 顺序练习",
                     onClick = {
                         navController.navigate(Screen.Quiz.createRoute(
@@ -111,7 +111,8 @@ fun WrongQuestionsScreen(
                             launchSingleTop = true
                         }
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    containerColor = Blue600
                 )
             }
 

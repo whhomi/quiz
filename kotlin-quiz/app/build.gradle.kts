@@ -13,8 +13,8 @@ android {
         applicationId = "com.quizhelper.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 12
-        versionName = "2.2.8"
+        versionCode = 13
+        versionName = "2.3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -113,4 +113,5 @@ dependencies {
 
     // Gson
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.google.zxing:core:3.5.3")
 }

@@ -48,6 +48,7 @@ fun ResultScreen(
                     else
                         viewModel.startPractice()
                 },
+                onShare = null,
                 onHome = {
                     showResultDialog = false
                     navigateTo = "home"

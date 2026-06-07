@@ -49,29 +49,33 @@ fun AboutScreen(navController: NavController) {
         ) {
             Text("📖", fontSize = 40.sp)
             Spacer(Modifier.height(4.dp))
-            Text("墨答 · v2.2.8", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Gray800)
+            Text("墨答 · v2.3.0", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Gray800)
             Text("优雅刷题，从容作答", fontSize = 13.sp, color = Gray500)
             Spacer(Modifier.height(16.dp))
 
             AboutClickableItem("📋", "更新日志", "查看各版本变更") { showChangelog = true }
             Spacer(Modifier.height(6.dp))
-            AboutClickableItem("📧", "邮箱", "littleboy@example.com") {
-                Intent(Intent.ACTION_SENDTO).apply { data = Uri.parse("mailto:littleboy@example.com") }.also { context.startActivity(it) }
+            AboutClickableItem("📧", "Email", "gantalbravexv@gmail.com") {
+                Intent(Intent.ACTION_SENDTO).apply { data = Uri.parse("mailto:gantalbravexv@gmail.com") }.also { context.startActivity(it) }
             }
             Spacer(Modifier.height(6.dp))
-            AboutClickableItem("🐙", "GitHub", "github.com/littleboy") {
-                Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/littleboy")).also { context.startActivity(it) }
+            AboutClickableItem("🐙", "GitHub", "github.com/whhomi") {
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/whhomi")).also { context.startActivity(it) }
             }
             Spacer(Modifier.height(6.dp))
-            AboutClickableItem("📦", "项目地址", "github.com/littleboy/quiz-helper") {
-                Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/littleboy/quiz-helper")).also { context.startActivity(it) }
+            AboutClickableItem("📦", "项目地址", "github.com/whhomi/quiz") {
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/whhomi/quiz")).also { context.startActivity(it) }
             }
             Spacer(Modifier.height(6.dp))
-            AboutItem("👤", "作者", "littleboy")
+            AboutClickableItem("🌐", "网页版", "https://quiz.gantalbravexv.workers.dev") {
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://quiz.gantalbravexv.workers.dev/")).also { context.startActivity(it) }
+            }
+            Spacer(Modifier.height(6.dp))
+            AboutItem("👤", "作者", "whhomi")
             Spacer(Modifier.height(6.dp))
             AboutItem("📜", "开源协议", "MIT License")
             Spacer(Modifier.height(16.dp))
-            Text("© 2026 littleboy", fontSize = 12.sp, color = Gray300)
+            Text("© 2026 whhomi", fontSize = 12.sp, color = Gray300)
             Spacer(Modifier.height(16.dp))
         }
     }
@@ -127,7 +131,17 @@ private fun ChangelogDialog(onDismiss: () -> Unit) {
 
 
     
-    private fun getFullChangelog(): String = """# 变更日志
+    private fun getFullChangelog(): String = """[2.3.0] — 2026-06-07 10:52
+
+🚀 新增功能
+- 关于页信息更新：作者whhomi、Email、GitHub、项目地址、网页版入口
+- 分享功能：考试完成后支持分享成绩长图（含鼓励语+二维码）至微信等社交平台
+
+🎨 UI
+- 错题集页两个练习按钮大小一致
+- 关于页新增「网页版」入口
+
+# 变更日志
 
 [2.2.8] — 2026-06-07 02:47
 

@@ -27,6 +27,7 @@ import com.quizhelper.app.ui.theme.*
 import com.quizhelper.app.util.ProgressInfo
 import com.quizhelper.app.util.TimeUtils
 import com.quizhelper.app.util.Encouragement
+import com.quizhelper.app.util.ShareUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

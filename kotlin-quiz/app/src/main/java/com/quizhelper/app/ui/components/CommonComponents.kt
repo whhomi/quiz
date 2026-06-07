@@ -413,7 +413,8 @@ fun EncouragementDialog(
     result: QuizResult,
     onViewDetail: () -> Unit,
     onRetry: () -> Unit,
-    onHome: () -> Unit
+    onHome: () -> Unit,
+    onShare: (() -> Unit)? = null
 ) {
     val encouragement = remember { if (Encouragement.rollEasterEgg()) Encouragement.EASTER_EGG_MESSAGE else Encouragement.random() }
     val isPass = result.correctRate >= 60
@@ -493,6 +494,17 @@ fun EncouragementDialog(
                     textColor = Blue600
                 )
                 Spacer(Modifier.height(8.dp))
+                if (onShare != null && result.mode.name == "EXAM") {
+                    SmallButton(
+                        text = "📤 分享成绩",
+                        onClick = onShare,
+                        modifier = Modifier.fillMaxWidth(),
+                        containerColor = Green500,
+                        textColor = White,
+                        fontSize = 14
+                    )
+                    Spacer(Modifier.height(8.dp))
+                }
                 OutlinedButton(
                     onClick = onHome,
                     modifier = Modifier.fillMaxWidth().height(48.dp),
