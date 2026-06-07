@@ -270,29 +270,33 @@ fun HistoryDetailScreen(
                                 options.forEachIndexed { idx, opt ->
                                     val isCorrectOpt = correctAns.contains(idx)
                                     val isWrongUser = userAns.contains(idx) && !isCorrectOpt
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .background(
-                                                when {
-                                                    isCorrectOpt -> Green50
-                                                    isWrongUser -> Red50
-                                                    else -> androidx.compose.ui.graphics.Color.Transparent
-                                                },
-                                                RoundedCornerShape(4.dp)
-                                            )
-                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    Surface(
+                                        color = when {
+                                            isCorrectOpt -> Green50
+                                            isWrongUser -> Red50
+                                            else -> androidx.compose.ui.graphics.Color.Transparent
+                                        },
+                                        shape = RoundedCornerShape(4.dp),
+                                        modifier = Modifier.fillMaxWidth().padding(vertical = 1.dp)
                                     ) {
-                                        Text(
-                                            "${('A' + idx)}. $opt",
-                                            fontSize = 13.sp,
-                                            color = if (isCorrectOpt || isWrongUser) Gray700 else Gray500
-                                        )
-                                        if (isCorrectOpt) {
-                                            Text(" ✓", color = Green500, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                                        }
-                                        if (isWrongUser) {
-                                            Text(" ✗ 你的选择", color = Red500, fontSize = 12.sp)
+                                        Row(
+                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                if (opt.isBlank()) "${('A' + idx)}. (空)" else "${('A' + idx)}. $opt",
+                                                fontSize = 13.sp,
+                                                color = if (isCorrectOpt || isWrongUser) Gray700 else Gray500,
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                            if (isCorrectOpt) {
+                                                Spacer(Modifier.width(4.dp))
+                                                Text("\u2713", color = Green500, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                            }
+                                            if (isWrongUser) {
+                                                Spacer(Modifier.width(4.dp))
+                                                Text("\u2717", color = Red500, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                            }
                                         }
                                     }
                                 }
