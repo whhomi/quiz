@@ -26,7 +26,7 @@ object ShareUtil {
             correctCount, totalCount, durationSeconds, isPass)
         val uri = saveToCache(context, bitmap)
         if (uri != null) {
-            shareImage(context, uri)
+            shareImage(context, uri, correctRate)
         }
     }
 
@@ -34,71 +34,70 @@ object ShareUtil {
                                      correctRate: Double, correctCount: Int, totalCount: Int,
                                      durationSeconds: Int, isPass: Boolean): Bitmap {
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-        val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 36f; color = Color.DKGRAY }
-        val boldPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 42f; color = Color.BLACK; isFakeBoldText = true }
+        val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-        // Estimate height
-        val headerH = 300
-        val infoH = 600
-        val qrH = 400
-        val footerH = 200
-        val totalH = headerH + infoH + qrH + footerH + PADDING * 5
-
+        val totalH = 1200
         val bitmap = Bitmap.createBitmap(WIDTH, totalH, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(Color.WHITE)
 
         var y = PADDING.toFloat()
 
-        // Header section
-        paint.color = Color.parseColor("#397DFF")
-        canvas.drawRoundRect(RectF(PADDING.toFloat(), y, (WIDTH - PADDING).toFloat(), y + 200f), CARD_RADIUS, CARD_RADIUS, paint)
+        // Header: Blue banner
+        paint.color = Color.parseColor("#2563EB")
+        canvas.drawRoundRect(RectF(PADDING.toFloat(), y, (WIDTH - PADDING).toFloat(), y + 180f), CARD_RADIUS, CARD_RADIUS, paint)
 
-        boldPaint.apply { textSize = 48f; color = Color.WHITE }
-        canvas.drawText("🏆 墨答 · 考试结果", WIDTH / 2f - 200f, y + 80f, boldPaint)
+        textPaint.apply { textSize = 44f; color = Color.WHITE; isFakeBoldText = true; isAntiAlias = true }
+        canvas.drawText("🏆 墨答 · 考试结果", WIDTH / 2f - 200f, y + 65f, textPaint)
 
-        boldPaint.apply { textSize = 36f; color = Color.WHITE }
-        canvas.drawText("${score.toInt()} 分", WIDTH / 2f - 60f, y + 140f, boldPaint)
-        y += 240f
-
-        // Stats section
-        paint.color = Color.parseColor(if (isPass) "#F0FDF4" else "#FEF2F2")
-        canvas.drawRoundRect(RectF(PADDING.toFloat(), y, (WIDTH - PADDING).toFloat(), y + 320f), CARD_RADIUS, CARD_RADIUS, paint)
-
-        val passColor = if (isPass) "#16A34A" else "#DC2626"
         textPaint.apply { textSize = 38f; color = Color.WHITE; isFakeBoldText = true }
-        paint.color = Color.parseColor(passColor)
-        canvas.drawRoundRect(RectF(WIDTH / 2f - 80f, y + 20f, WIDTH / 2f + 80f, y + 80f), 20f, 20f, paint)
-        textPaint.color = Color.WHITE
-        canvas.drawText("${score.toInt()}分", WIDTH / 2f - 50f, y + 62f, textPaint)
+        canvas.drawText(if (isPass) "🎉 恭喜通过！" else "💪 继续加油！", WIDTH / 2f - 150f, y + 130f, textPaint)
+        y += 220f
 
-        textPaint.apply { textSize = 32f; color = Color.GRAY; isFakeBoldText = false }
-        canvas.drawText("正确率: ${correctRate.toInt()}%", PADDING + 30f, y + 130f, textPaint)
-        canvas.drawText("正确: $correctCount / $totalCount 题", PADDING + 30f, y + 180f, textPaint)
-        canvas.drawText("用时: ${TimeUtils.formatDuration(durationSeconds)}", PADDING + 30f, y + 230f, textPaint)
+        // Score card
+        paint.color = Color.parseColor(if (isPass) "#F0FDF4" else "#FEF2F2")
+        canvas.drawRoundRect(RectF(PADDING.toFloat(), y, (WIDTH - PADDING).toFloat(), y + 240f), CARD_RADIUS, CARD_RADIUS, paint)
+
+        textPaint.apply { textSize = 56f; color = Color.parseColor(if (isPass) "#16A34A" else "#DC2626"); isFakeBoldText = true }
+        canvas.drawText("${score.toInt()} 分", PADDING + 40f, y + 75f, textPaint)
+
+        textPaint.apply { textSize = 40f; color = Color.GRAY; isFakeBoldText = false }
+        canvas.drawText("正确率 ${correctRate.toInt()}%", PADDING + 40f, y + 140f, textPaint)
+
+        textPaint.apply { textSize = 30f; color = Color.DKGRAY; isFakeBoldText = false }
+        canvas.drawText("正确: $correctCount / $totalCount 题", WIDTH / 2f + 60f, y + 70f, textPaint)
+        canvas.drawText("用时: ${TimeUtils.formatDuration(durationSeconds)}", WIDTH / 2f + 60f, y + 120f, textPaint)
+        canvas.drawText("已答: $correctCount / $totalCount", WIDTH / 2f + 60f, y + 170f, textPaint)
+        y += 280f
+
+        // Divider
+        paint.color = Color.parseColor("#E5E7EB")
+        canvas.drawRect(PADDING.toFloat(), y, (WIDTH - PADDING).toFloat(), y + 2f, paint)
+        y += 30f
 
         // Encouragement
         val enc = Encouragement.random()
         paint.color = Color.parseColor("#EFF6FF")
-        canvas.drawRoundRect(RectF(PADDING.toFloat(), y + 280f, (WIDTH - PADDING).toFloat(), y + 360f), 20f, 20f, paint)
-        textPaint.apply { textSize = 32f; color = Color.parseColor("#2563EB") }
-        canvas.drawText("💪 $enc", PADDING + 30f, y + 340f, textPaint)
+        canvas.drawRoundRect(RectF(PADDING.toFloat(), y, (WIDTH - PADDING).toFloat(), y + 80f), 20f, 20f, paint)
+        textPaint.apply { textSize = 32f; color = Color.parseColor("#2563EB"); isFakeBoldText = false }
+        canvas.drawText("💪 $enc", PADDING + 30f, y + 50f, textPaint)
+        y += 120f
 
-        y += 400f
-
-        // QR Code section
-        val qrCode = generateQRCode("https://github.com/whhomi/quiz/releases", 300)
+        // QR Code
+        val qrCode = generateQRCode("https://github.com/whhomi/quiz/releases", 280)
         if (qrCode != null) {
-            val qrX = WIDTH / 2 - 150
+            val qrX = WIDTH / 2 - 140
             canvas.drawBitmap(qrCode, qrX.toFloat(), y, null)
         }
-        textPaint.apply { textSize = 28f; color = Color.GRAY; isFakeBoldText = false }
-        canvas.drawText("扫码下载墨答", WIDTH / 2f - 120f, y + 340f, textPaint)
-        y += 380f
+        textPaint.apply { textSize = 26f; color = Color.GRAY; isFakeBoldText = false }
+        canvas.drawText("扫码下载墨答 App", WIDTH / 2f - 110f, y + 320f, textPaint)
+        y += 360f
 
         // Footer
-        textPaint.apply { textSize = 24f; color = Color.LTGRAY }
-        canvas.drawText("墨答 - 优雅刷题，从容作答", WIDTH / 2f - 180f, y + 40f, textPaint)
+        paint.color = Color.parseColor("#F3F4F6")
+        canvas.drawRoundRect(RectF(PADDING.toFloat(), y, (WIDTH - PADDING).toFloat(), totalH - PADDING.toFloat()), CARD_RADIUS, CARD_RADIUS, paint)
+        textPaint.apply { textSize = 24f; color = Color.LTGRAY; isFakeBoldText = false }
+        canvas.drawText("墨答 - 优雅刷题，从容作答", WIDTH / 2f - 170f, y + 40f, textPaint)
 
         return bitmap
     }
@@ -125,11 +124,11 @@ object ShareUtil {
         } catch (e: Exception) { null }
     }
 
-    private fun shareImage(context: Context, uri: Uri) {
+    private fun shareImage(context: Context, uri: Uri, correctRate: Double) {
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "image/png"
             putExtra(Intent.EXTRA_STREAM, uri)
-            putExtra(Intent.EXTRA_TEXT, "💪 ${Encouragement.random()} —— 来自 墨答 App")
+            putExtra(Intent.EXTRA_TEXT, "📝 我在墨答完成了考试，正确率 ${correctRate.toInt()}%！💪 ${Encouragement.random()} —— 来自 墨答 App")
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         context.startActivity(Intent.createChooser(intent, "分享考试结果"))
