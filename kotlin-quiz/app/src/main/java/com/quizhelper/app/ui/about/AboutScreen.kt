@@ -49,7 +49,7 @@ fun AboutScreen(navController: NavController) {
         ) {
             Text("📖", fontSize = 40.sp)
             Spacer(Modifier.height(4.dp))
-            Text("墨答 · v2.3.6", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Gray800)
+            Text("墨答 · v2.3.7", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Gray800)
             Text("优雅刷题，从容作答", fontSize = 13.sp, color = Gray500)
             Spacer(Modifier.height(16.dp))
 
