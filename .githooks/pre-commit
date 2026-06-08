@@ -9,7 +9,7 @@ echo ""
 echo "🔍 [pre-commit] 检查版本号和 CHANGELOG..."
 
 # 1. 检测本次是否有代码变更
-STAGED=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(kt|java|xml|kts|gradle|pro|png)$' || true)
+STAGED=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(kt|java|xml|kts|gradle|pro|png|sh)$' || true)
 
 if [ -z "$STAGED" ]; then
     echo "✅ [pre-commit] 无代码变更，跳过版本检查"
