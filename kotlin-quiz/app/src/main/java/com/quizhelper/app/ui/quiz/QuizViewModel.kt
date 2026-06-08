@@ -7,6 +7,7 @@ import com.quizhelper.app.data.model.*
 import com.quizhelper.app.data.repository.QuizRepository
 import com.quizhelper.app.util.Logger
 import com.quizhelper.app.util.ProgressInfo
+import com.quizhelper.app.util.PracticeProgressStore
 import com.quizhelper.app.util.QuizEngine
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -49,16 +50,27 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
     /** 当前练习来源: "all" 全部题目, "wrong" 错题集 */
     private var questionSource: String = "all"
 
-    fun startPractice(random: Boolean = true, source: String = "all") {
+    fun startPractice(random: Boolean = true, source: String = "all", resume: Boolean = false) {
         questionSource = source
         _isFinished.value = false
         _result.value = null
         _isReady.value = false
         viewModelScope.launch {
+            val allQuestions = repository.getAllQuestionsList()
+            if (allQuestions.isEmpty()) { _isReady.value = true; return@launch }
+            if (resume && !random && source == "all") {
+                val restored: com.quizhelper.app.data.model.QuizSession? = PracticeProgressStore.restoreSession(getApplication(), allQuestions)
+                if (restored != null) {
+                    _session = restored
+                    refreshFromSession()
+                    _isReady.value = true
+                    return@launch
+                }
+            }
             val questions = if (source == "wrong") {
                 repository.getWrongQuestionsList()
             } else {
-                repository.getAllQuestionsList()
+                allQuestions
             }
             if (questions.isEmpty()) { _isReady.value = true; return@launch }
             _session = QuizEngine.createSession(questions, random = random, mode = QuizMode.PRACTICE)
@@ -164,6 +176,9 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
         s.endTime = System.currentTimeMillis()
         s.isFinished = true
         val result = if (s.mode == QuizMode.EXAM) QuizEngine.buildExamResult(s) else QuizEngine.buildResult(s)
+        if (s.mode == QuizMode.PRACTICE) {
+            PracticeProgressStore.clear(getApplication())
+        }
         _result.value = result
         _isFinished.value = true
 
@@ -186,6 +201,12 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
             } else if (questionSource == "wrong") {
                 repository.removeFromWrongQuestions(questionId)
             }
+        }
+    }
+
+    fun saveProgress() {
+        if (_session?.mode == QuizMode.PRACTICE && questionSource == "all") {
+            _session?.let { PracticeProgressStore.saveSession(getApplication(), it) }
         }
     }
 
