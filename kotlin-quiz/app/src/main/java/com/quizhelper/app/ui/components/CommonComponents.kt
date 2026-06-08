@@ -148,7 +148,7 @@ fun ScoreCircle(
     modifier: Modifier = Modifier
 ) {
     val percentage = if (maxScore != null && maxScore > 0) (score / maxScore * 100) else score
-    val isPass = percentage >= 60
+    val isPass = percentage >= 80
     val displayText = if (maxScore != null && maxScore > 0) {
         "${score.toInt()}分"
     } else {
@@ -417,7 +417,7 @@ fun EncouragementDialog(
     onShare: (() -> Unit)? = null
 ) {
     val encouragement = remember { if (Encouragement.rollEasterEgg()) Encouragement.EASTER_EGG_MESSAGE else Encouragement.random() }
-    val isPass = result.correctRate >= 60
+    val isPass = result.correctRate >= 80
     val isEasterEgg = encouragement == Encouragement.EASTER_EGG_MESSAGE
 
     AlertDialog(

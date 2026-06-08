@@ -123,13 +123,13 @@ private fun HistoryCard(record: HistoryRecord, onClick: () -> Unit) {
                 }
                 val correctRate = if (record.totalCount > 0) (record.correctCount.toDouble() / record.totalCount * 100).toInt() else 0
                 val scoreColor = when {
-                    record.mode == "exam" -> if (correctRate >= 60) Green700 else Red600
+                    record.mode == "exam" -> if (correctRate >= 80) Green700 else Red600
                     correctRate >= 80 -> Green700
                     correctRate >= 60 -> Amber700
                     else -> Red600
                 }
                 val bgColor = when {
-                    record.mode == "exam" -> if (correctRate >= 60) Green50 else Red50
+                    record.mode == "exam" -> if (correctRate >= 80) Green50 else Red50
                     correctRate >= 80 -> Green50
                     correctRate >= 60 -> Amber50
                     else -> Red50

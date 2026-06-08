@@ -97,13 +97,13 @@ object QuizEngine {
         }
 
         if (examType == "grouped") {
-            pickAndTag(QuestionType.SINGLE, 40)
+            pickAndTag(QuestionType.SINGLE, 60)
             pickAndTag(QuestionType.MULTIPLE, 100)
-            pickAndTag(QuestionType.BOOLEAN, 60)
+            pickAndTag(QuestionType.BOOLEAN, 40)
         } else {
-            pickAndTag(QuestionType.SINGLE, 40)
+            pickAndTag(QuestionType.SINGLE, 60)
             pickAndTag(QuestionType.MULTIPLE, 100)
-            pickAndTag(QuestionType.BOOLEAN, 60)
+            pickAndTag(QuestionType.BOOLEAN, 40)
             return shuffle(selected)
         }
         return selected

@@ -22,6 +22,8 @@ import com.quizhelper.app.ui.components.*
 import com.quizhelper.app.ui.theme.*
 import com.quizhelper.app.ui.navigation.Screen
 import com.quizhelper.app.util.TimeUtils
+import com.quizhelper.app.util.ExamCountdown
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -236,6 +238,35 @@ fun HomeScreen(
                             containerColor = Amber600,
                             fontSize = 14
                         )
+                    }
+                }
+            }
+
+            // Countdown section
+            var countdownTime by remember { mutableStateOf(System.currentTimeMillis()) }
+            LaunchedEffect(Unit) {
+                while(true) {
+                    delay(60000L)
+                    countdownTime = System.currentTimeMillis()
+                }
+            }
+            val examInfo = remember(countdownTime) { ExamCountdown.get() }
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = androidx.compose.ui.graphics.Color(examInfo.bgColor)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(examInfo.icon, fontSize = 28.sp)
+                    Spacer(Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(examInfo.title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Gray800)
+                        Spacer(Modifier.height(4.dp))
+                        Text(examInfo.message, fontSize = 12.sp, color = Gray500, lineHeight = 18.sp)
                     }
                 }
             }

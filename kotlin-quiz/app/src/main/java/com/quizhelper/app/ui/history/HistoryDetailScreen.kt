@@ -85,7 +85,7 @@ fun HistoryDetailScreen(
                                         correctCount = r.correctCount,
                                         totalCount = r.totalCount,
                                         durationSeconds = r.duration,
-                                        isPass = r.score >= 60
+                                        isPass = r.score >= 80
                                     )
                                 },
                                 containerColor = Purple600,
@@ -111,7 +111,7 @@ fun HistoryDetailScreen(
                             "${r.score.toInt()} 分",
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (r.score >= 60) Green600 else Red500
+                            color = if (r.score >= 80) Green600 else Red500
                         )
                         Text("得分", fontSize = 11.sp, color = Gray400)
                     }
@@ -122,7 +122,7 @@ fun HistoryDetailScreen(
                             "${rate}%",
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (rate >= 60) Green600 else Red500
+                            color = if (rate >= 80) Green600 else Red500
                         )
                         Text("正确率", fontSize = 11.sp, color = Gray400)
                     }

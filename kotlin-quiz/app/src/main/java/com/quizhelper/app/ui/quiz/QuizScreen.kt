@@ -573,7 +573,7 @@ fun ResultContent(
         )
         Spacer(Modifier.height(16.dp))
 
-        val isPass = result.correctRate >= 60
+        val isPass = result.correctRate >= 80
         ScoreCircle(
             score = result.score,
             maxScore = result.maxScore ?: if (result.mode == QuizMode.EXAM) 100.0 else result.totalCount.toDouble()
