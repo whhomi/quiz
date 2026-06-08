@@ -130,6 +130,7 @@ fun HomeScreen(
             }
         } else {
             // Has question bank
+            val sequentialProgress by viewModel.sequentialProgress.collectAsState()
             Text(
                 "墨答",
                 fontSize = 24.sp,
@@ -211,9 +212,10 @@ fun HomeScreen(
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Column(Modifier.padding(16.dp)) {
-                    Text("📝 模拟考试", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Gray700)
-                    Spacer(Modifier.height(8.dp))
-                    Text("限时 100 分钟 · 满分 100 分", fontSize = 12.sp, color = Gray400)
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Text("📝 模拟考试", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Gray700)
+                        Text("限时 100 分钟 · 满分 100 分", fontSize = 11.sp, color = Gray400)
+                    }
                     Spacer(Modifier.height(12.dp))
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         SmallButton(
@@ -242,6 +244,39 @@ fun HomeScreen(
                 }
             }
 
+            // Sequential progress section
+            if (sequentialProgress != null) {
+                val answered = sequentialProgress!!.first
+                val total = sequentialProgress!!.second
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = White),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                ) {
+                    Column(Modifier.padding(16.dp)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                            Text("📖 顺序练习进度", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Gray700)
+                            Surface(shape = RoundedCornerShape(12.dp), color = Blue50) {
+                                Text("已答 $answered / $total 题", fontSize = 12.sp, color = Blue600, fontWeight = FontWeight.Medium, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp))
+                            }
+                        }
+                        Spacer(Modifier.height(12.dp))
+                        val pct = if (total > 0) (answered.toFloat() / total * 100).toInt() else 0
+                        Box(
+                            modifier = Modifier.fillMaxWidth().height(8.dp).background(Gray100, RoundedCornerShape(4.dp))
+                        ) {
+                            Box(
+                                modifier = Modifier.fillMaxHeight().fillMaxWidth((pct.toFloat() / 100f).coerceIn(0.02f, 1f)).background(Blue500, RoundedCornerShape(4.dp))
+                            )
+                        }
+                        Spacer(Modifier.height(4.dp))
+                        Text("完成 ${pct}%", fontSize = 11.sp, color = Gray400, modifier = Modifier.align(Alignment.End))
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+            }
+
             // Countdown section
             var countdownTime by remember { mutableStateOf(System.currentTimeMillis()) }
             LaunchedEffect(Unit) {
@@ -257,17 +292,17 @@ fun HomeScreen(
                 colors = CardDefaults.cardColors(containerColor = androidx.compose.ui.graphics.Color(examInfo.bgColor)),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
-                Row(
-                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(examInfo.icon, fontSize = 28.sp)
-                    Spacer(Modifier.width(12.dp))
-                    Column(modifier = Modifier.weight(1f)) {
+                Column(Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(examInfo.icon, fontSize = 22.sp)
+                        Spacer(Modifier.width(10.dp))
                         Text(examInfo.title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Gray800)
-                        Spacer(Modifier.height(4.dp))
-                        Text(examInfo.message, fontSize = 12.sp, color = Gray500, lineHeight = 18.sp)
                     }
+                    Spacer(Modifier.height(8.dp))
+                    Text(examInfo.message, fontSize = 12.sp, color = Gray500, lineHeight = 18.sp)
                 }
             }
 
@@ -286,7 +321,7 @@ fun HomeScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("📕 错题集", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Gray700)
+                    Text("📕 错题集", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Gray700)
                         if (wrongCount > 0) {
                             Surface(
                                 shape = RoundedCornerShape(12.dp),

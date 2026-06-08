@@ -9,6 +9,7 @@ import com.quizhelper.app.data.model.ImportResult
 import com.quizhelper.app.data.model.QuestionBankMeta
 import com.quizhelper.app.data.repository.QuizRepository
 import com.quizhelper.app.util.Logger
+import com.quizhelper.app.util.PracticeProgressStore
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -32,6 +33,16 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _isImporting = MutableStateFlow(false)
     val isImporting: StateFlow<Boolean> = _isImporting.asStateFlow()
+
+    private val _sequentialProgress = MutableStateFlow<Pair<Int, Int>?>(null)
+    val sequentialProgress: StateFlow<Pair<Int, Int>?> = _sequentialProgress.asStateFlow()
+
+    fun refreshSequentialProgress() {
+        val app = getApplication<android.app.Application>()
+        _sequentialProgress.value = PracticeProgressStore.getProgressSummary(app)
+    }
+
+    init { refreshSequentialProgress() }
 
     fun importFile(uri: Uri) {
         viewModelScope.launch {

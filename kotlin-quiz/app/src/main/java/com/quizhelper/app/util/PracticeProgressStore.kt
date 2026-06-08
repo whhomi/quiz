@@ -38,6 +38,11 @@ object PracticeProgressStore {
 
     fun hasProgress(context: Context): Boolean = load(context) != null
 
+    fun getProgressSummary(context: Context): Pair<Int, Int>? {
+        val progress = load(context) ?: return null
+        return Pair(progress.answers.size, progress.questions.size)
+    }
+
     fun restoreSession(context: Context, allQuestions: List<Question>): QuizSession? {
         val progress = load(context) ?: return null
         val questionMap = allQuestions.associateBy { it.id }

@@ -1,3 +1,14 @@
+## [2.3.6] — 2026-06-08 21:48
+
+### 🎨 UI
+- 首页布局卡片间距统一：所有卡片标题+Spacer(12dp)+内容
+- 考试说明移到标题行右侧，倒计时卡片改用Column布局
+- 首页新增顺序练习进度条卡片（已答/总题+百分比）
+
+### 🔧 技术改进
+- PracticeProgressStore新增getProgressSummary()方法
+- HomeViewModel新增sequentialProgress状态
+
 ## [2.3.5] — 2026-06-08 21:35
 
 ### 🚀 新增功能
